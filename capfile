@@ -1,0 +1,33 @@
+require 'rubygems'
+require 'obbistrano'
+
+set :application, "app_name"
+role :web,        "#{application}.com"
+role :host,       "#{application}.com"
+set :user,        "#{application}"
+set :password,    "secret"
+set :repository,  "git@github.com:oneblackbear/#{application}.git"
+set :branch,      "master"
+set :deploy_to,   "."
+set :build_to,    "."
+set :databases,   ["#{application}"]
+set :aliases,     ["www.#{application}.com"]
+set :phpwax,      "v3.1"
+set :cms,         "v7"
+set :plugins,     ["cms"]
+
+desc "Sets up variables to deploy to the beta server, run this just before the other command you want, e.g. cap beta deploy"
+task :beta do
+  set :application, "app_name"
+  role :web,        "beta.#{application}.com"
+  role :host,       "beta.#{application}.com"
+  set :user,        "#{application}_beta"
+  set :password,    "secret"
+  set :repository,  "git@github.com:oneblackbear/#{application}.git"
+  set :branch,      $1 if `git branch` =~ /\* (\S+)\s/m #will deploy the current branch, make sure you have pushed this to your remote repository first
+  set :deploy_to,   "."
+  set :build_to,    "."
+  set :databases,   ["#{application}_beta"]
+  set :phpwax,      "v3.1"
+  set :cms,         "v6.pretty"
+end

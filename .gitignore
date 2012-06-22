@@ -1,0 +1,13 @@
+._*
+.DS_Store
+
+public/files/*
+!public/files/README
+
+/tmp
+!tmp/cache/README
+!tmp/log/README
+!tmp/session/README
+
+public/javascripts/build
+public/stylesheets/build
