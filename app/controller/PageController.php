@@ -13,7 +13,22 @@
 
 class PageController extends ApplicationController{
   
-  public function index(){}
+  public function create(){
+    $model_a = new ModelA;
+    $model_b = new ModelB;
+    foreach(range(1,200) as $i){
+      $model_a->id = false;
+      $model_a->title = "a$i";
+      $model_a->save();
+
+      $model_b->id = false;
+      $model_b->title = "b$i";
+      $model_b->save();
+
+      if(rand(0,1) > 0.5) $model_a->model_b = $model_b;
+    }
+    echo "created"; exit;
+  }
   
 }
 ?>
