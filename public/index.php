@@ -38,3 +38,4 @@ $serviceManager->get('ModuleManager')->loadModules();
 
 // Run application
 $serviceManager->get('Application')->bootstrap()->run()->send();
+print_r(memory_get_peak_usage(1));
