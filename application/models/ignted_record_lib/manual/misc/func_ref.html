@@ -1,0 +1,265 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv='expires' content='-1' />
+	<meta http-equiv= 'pragma' content='no-cache' />
+	
+	<title>Function Reference - IgnitedRecord User Guide Version 0.2.0</title>
+	
+	<link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+	<link rel="Shortcut Icon" href="../images/favicon.ico">
+	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+	
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../nav.js"></script>
+	<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+	$('#nav').hide();
+	$('#toggle_toc').click(function(){
+		$('#nav').slideToggle();
+	})
+});
+	</script>
+<style type="text/css" media="screen">
+.func_ref{
+	border-bottom: 1px solid #eee;
+}
+.func_ref h3 .ret{
+	font-size: 11px;
+}
+.param{
+	font-size: 10px;
+	font-weight: bold;
+}
+#content .func_ref table{
+	margin-left: 30px;
+}
+#content .func_ref table th{
+	background: #ccc;
+	color: #777;
+	font-size: 10px;
+}
+</style>
+</head>
+<body>
+<div id="nav">
+	<script type="text/javascript">menu('../');</script>
+</div>
+<div id="nav2"><a name="top"></a><a id="toggle_toc"><img src="../images/nav_toggle.jpg" width="153" height="44" border="0" title="Toggle Table of Contents" alt="Toggle Table of Contents" /></a></div>
+<div id="masthead">
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td><h1>IgnitedRecord User Guide Version 0.2.0</h1></td>
+<td id="breadcrumb_right"><a href="../toc.html">Table of Contents Page</a></td>
+</tr>
+</table>
+</div>
+<!-- END NAVIGATION -->
+
+
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td id="breadcrumb">
+<a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord Home</a> &nbsp;&#8250;&nbsp; IgnitedRecord User Guide &nbsp;&#8250;&nbsp; Function Reference
+</td>
+<td id="searchbox"></td>
+</tr>
+</table>
+
+<div id="content">
+	<h1>Function Reference</h1>
+	
+	<h2>IgnitedRecord class</h2>
+	
+	<div class="func_ref">
+		<h3 class="func"><var class="ret">IR_RelProperty_has</var> has_many('<var>plural_name</var>', [<var>settings</var> = array()])</h3>
+		<p class="param">Parameters:</p>
+		<table cellpadding="0" cellspacing="1" border="0" class="tableborder">
+			<tr>
+				<th>type</th>
+				<th>name</th>
+				<th>desc.</th>
+			</tr>
+			<tr>
+				<td class="td">string</td>
+				<td class="td">plural_name</th>
+				<td class="td">
+					The name this relation will use
+				</td>
+			</tr>
+			<tr>
+				<td class="td">array</td>
+				<td class="td">settings</th>
+				<td class="td">
+					The settings for the relation
+				</td>
+			</tr>
+		</table>
+		<p>
+			Specifies a Has Many relation between this table and another.
+		</p>
+	</div>
+	
+	<div class="func_ref">
+		<h3 class="func"><var class="ret">IR_RelProperty_has</var> has_one('<var>singular_name</var>', [<var>settings</var> = array()])</h3>
+		<p class="param">Parameters:</p>
+		<table cellpadding="0" cellspacing="1" border="0" class="tableborder">
+			<tr>
+				<th>type</th>
+				<th>name</th>
+				<th>desc.</th>
+			</tr>
+			<tr>
+				<td class="td">string</td>
+				<td class="td">singular_name</th>
+				<td class="td">
+					The name this relation will use
+				</td>
+			</tr>
+			<tr>
+				<td class="td">array</td>
+				<td class="td">settings</th>
+				<td class="td">
+					The settings for the relation
+				</td>
+			</tr>
+		</table>
+		<p>
+			Specifies a Has One relation between this table and another.
+		</p>
+	</div>
+	
+	<div class="func_ref">
+		<h3 class="func"><var class="ret">IR_RelProperty</var> belongs_to('<var>singular_name</var>', [<var>settings</var> = array()])</h3>
+		<p class="param">Parameters:</p>
+		<table cellpadding="0" cellspacing="1" border="0" class="tableborder">
+			<tr>
+				<th>type</th>
+				<th>name</th>
+				<th>desc.</th>
+			</tr>
+			<tr>
+				<td class="td">string</td>
+				<td class="td">singular_name</th>
+				<td class="td">
+					The name this relation will use
+				</td>
+			</tr>
+			<tr>
+				<td class="td">array</td>
+				<td class="td">settings</th>
+				<td class="td">
+					The settings for the relation
+				</td>
+			</tr>
+		</table>
+		<p>
+			Specifies a Belongs To relation between this table and another.
+		</p>
+	</div>
+	
+	<div class="func_ref">
+		<h3 class="func"><var class="ret">object</var> factory('<var>table</var>', [<var>settings</var> = array()])</h3>
+		<p class="param">Parameters:</p>
+		<table cellpadding="0" cellspacing="1" border="0" class="tableborder">
+			<tr>
+				<th>type</th>
+				<th>name</th>
+				<th>desc.</th>
+			</tr>
+			<tr>
+				<td class="td">string</td>
+				<td class="td">table</th>
+				<td class="td">
+					The table the new instance will be mapped to
+				</td>
+			</tr>
+			<tr>
+				<td class="td">array</td>
+				<td class="td">settings</th>
+				<td class="td">
+					The settings for the new instance
+				</td>
+			</tr>
+		</table>
+		<p>
+			Creates a new IgnitedRecord instance.<br />
+			Can be called statically.
+		</p>
+	</div>
+	
+	<div class="func_ref">
+		<h3 class="func"><var class="ret">object</var> yamlfactory('<var>filename</var>')</h3>
+		<p class="param">Parameters:</p>
+		<table cellpadding="0" cellspacing="1" border="0" class="tableborder">
+			<tr>
+				<th>type</th>
+				<th>name</th>
+				<th>desc.</th>
+			</tr>
+			<tr>
+				<td class="td">string</td>
+				<td class="td">filename</th>
+				<td class="td">
+					A filename or a yaml string
+				</td>
+			</tr>
+		</table>
+		<p>
+			Creates a new IgnitedRecord instance from the settings stored in yaml data.<br />
+			Can be called statically.
+		</p>
+	</div>
+	
+	<div class="func_ref">
+		<h3 class="func"><var class="ret">void</var> add_hook('<var>name</var>', <var>callable</var> [, <var>priority</var> = 10])</h3>
+		<p class="param">Parameters:</p>
+		<table cellpadding="0" cellspacing="1" border="0" class="tableborder">
+			<tr>
+				<th>type</th>
+				<th>name</th>
+				<th>desc.</th>
+			</tr>
+			<tr>
+				<td class="td">string</td>
+				<td class="td">name</th>
+				<td class="td">
+					A hook name
+				</td>
+			</tr>
+			<tr>
+				<td class="td">
+					string<br />
+					or array(&amp;object, string)
+				</td>
+				<td class="td">callable</th>
+				<td class="td">
+					A callable which will be called when the hook with <var>name</var> executes
+				</td>
+			</tr>
+			<tr>
+				<td class="td">int</td>
+				<td class="td">priority</th>
+				<td class="td">
+					The priority of the hooked function, lower number = higher priority
+				</td>
+			</tr>
+		</table>
+		<p>
+			Adds a function / method to the hook <var>name</var>
+		</p>
+	</div>
+	
+</div>
+
+
+<div id="footer">
+<p><a href="#top">Top of Page</a></p>
+<p><a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord</a>  &nbsp;&middot;&nbsp; Copyright &#169; 2008 &nbsp;&middot;&nbsp; Martin Wernstahl</p>
+<p><a href="http://codeigniter.com">CodeIgniter</a> &nbsp;&middot;&nbsp; Copyright &#169; 2006-2008 &nbsp;&middot;&nbsp; <a href="http://ellislab.com/">Ellislab, Inc.</a></p>
+</div>
+
+
+</body>
+</html>

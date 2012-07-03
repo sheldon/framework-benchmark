@@ -1,0 +1,123 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv='expires' content='-1' />
+	<meta http-equiv= 'pragma' content='no-cache' />
+	
+	<title>How To Make a Behaviour - IgnitedRecord User Guide Version 0.2.0</title>
+	
+	<link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+	<link rel="Shortcut Icon" href="../images/favicon.ico">
+	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+	
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../nav.js"></script>
+	<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+	$('#nav').hide();
+	$('#toggle_toc').click(function(){
+		$('#nav').slideToggle();
+	})
+});
+	</script>
+</head>
+<body>
+<div id="nav">
+	<script type="text/javascript">menu('../');</script>
+</div>
+<div id="nav2"><a name="top"></a><a id="toggle_toc"><img src="../images/nav_toggle.jpg" width="153" height="44" border="0" title="Toggle Table of Contents" alt="Toggle Table of Contents" /></a></div>
+<div id="masthead">
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td><h1>IgnitedRecord User Guide Version 0.2.0</h1></td>
+<td id="breadcrumb_right"><a href="../toc.html">Table of Contents Page</a></td>
+</tr>
+</table>
+</div>
+<!-- END NAVIGATION -->
+
+
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td id="breadcrumb">
+<a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord Home</a> &nbsp;&#8250;&nbsp; IgnitedRecord User Guide &nbsp;&#8250;&nbsp; How To Make a Behaviour
+</td>
+<td id="searchbox"></td>
+</tr>
+</table>
+
+<div id="content">
+	<h1>How To Make a Behaviour</h1>
+	
+	<p>
+		Behaviours consist of at least one class, the main behaviour class.
+		This class is named IgnitedRecord_{behaviour_name} and contains at least a constructor.
+	</p>
+	
+	<p>
+		Example:
+	</p>
+	
+	<code>
+		class IgnitedRecord_sample{<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;function IgnitedRecord_sample(&$parent, $options){<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// do something here, register hooks or whatever...<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;// other methods goes here, which can be used via aggregation<br />
+		}
+	</code>
+	
+	<p>
+		The <var>parent</var> parameter is the IgnitedRecord instance this
+		behavior (instance) is assigned to, use it to register hooks and manipulate things.<br />
+		The <var>options</var> parameter is an array which contains the options of the behaviour,
+		it can be empty, and can contain whatever options you like.
+	</p>
+	
+	<h2>The child_class_helpers</h2>
+	
+	<p>
+		A child class helper is a class which acts like a "mini behaviour" for
+		the records, providing extra methods to the record objects
+		(See the tree behaviour code for an example).
+	</p>
+	
+	<p>
+		Example of adding a child_class helper:
+	</p>
+	
+	<code>
+		class IgnitedRecord_sample{<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;function IgnitedRecord_sample(&$parent, $options){<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$parent->child_class_helper['property_name'] = 'sample_helper';<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+		}<br />
+		<br />
+		class sample_helper{<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;function sample_helper(&$record){<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$this->record =& $record; // save it so we can act upon it later<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+		<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;function do_something(){<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;echo $this->record->group_id == 1 ? 'OOhh, Root access!!' : 'Normal mortal';<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+		}
+	</code>
+	
+	<p>
+		The <var>record</var> parameter is the record the helper is assigned to.
+		To fetch the parent model, access the property __instance of the <var>record</var>.
+	</p>
+</div>
+
+
+<div id="footer">
+<p><a href="#top">Top of Page</a></p>
+<p><a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord</a>  &nbsp;&middot;&nbsp; Copyright &#169; 2008 &nbsp;&middot;&nbsp; Martin Wernstahl</p>
+<p><a href="http://codeigniter.com">CodeIgniter</a> &nbsp;&middot;&nbsp; Copyright &#169; 2006-2008 &nbsp;&middot;&nbsp; <a href="http://ellislab.com/">Ellislab, Inc.</a></p>
+</div>
+
+
+</body>
+</html>

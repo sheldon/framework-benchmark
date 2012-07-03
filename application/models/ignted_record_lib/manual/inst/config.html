@@ -1,0 +1,278 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv='expires' content='-1' />
+	<meta http-equiv= 'pragma' content='no-cache' />
+	
+	<title>Configuration - IgnitedRecord User Guide Version 0.2.0</title>
+	
+	<link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+	<link rel="Shortcut Icon" href="../images/favicon.ico">
+	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+	
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../nav.js"></script>
+	<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+	$('#nav').hide();
+	$('#toggle_toc').click(function(){
+		$('#nav').slideToggle();
+	})
+});
+	</script>
+</head>
+<body>
+<div id="nav">
+	<script type="text/javascript">menu('../');</script>
+</div>
+<div id="nav2"><a name="top"></a><a id="toggle_toc"><img src="../images/nav_toggle.jpg" width="153" height="44" border="0" title="Toggle Table of Contents" alt="Toggle Table of Contents" /></a></div>
+<div id="masthead">
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td><h1>IgnitedRecord User Guide Version 0.2.0</h1></td>
+<td id="breadcrumb_right"><a href="../toc.html">Table of Contents Page</a></td>
+</tr>
+</table>
+</div>
+<!-- END NAVIGATION -->
+
+
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td id="breadcrumb">
+<a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord Home</a> &nbsp;&#8250;&nbsp; IgnitedRecord User Guide &nbsp;&#8250;&nbsp; Configuration
+</td>
+<td id="searchbox"></td>
+</tr>
+</table>
+
+<div id="content">
+	<h1>Configuration</h1>
+	
+	<p>
+		IgnitedRecord is very easy to use when you follow all default assumptions.<br />
+		You can override almost any configuration with ease,
+		but to make it as easy as possible (and with least amount of code) it would be recommended to follow the defaults.
+	</p>
+	
+	<h2>Default Conventions</h2>
+	
+	<ul>
+		<li>
+			<strong>Model name</strong> - Should be singular, and may end with '_model'
+			(which will be removed when model name is used by other settings).
+		</li>
+		<li><strong>Table name</strong> - The plural of <kbd>model name</kbd>, pluralized by CI's inflector helper</li>
+		<li><strong>Unique id column</strong> - 'id', and it would preferrably be an UNSIGNED INT with AUTO INCREMENT</li>
+		<li><strong>Foreign key columns</strong> - '<kbd>model name</kbd>_id' of the related table</li>
+		<li>
+			<strong>Name of relationships to single rows</strong> (Has One and Belongs To) -
+			The model name of the related table, or singular of the related table<br />
+			You can say a user Belongs To a group
+		</li>
+		<li>
+			<strong>Name of relationships to multiple rows</strong> (Has Many and <abbr title="Has And Belongs To Many">habtm</abbr>) -
+			The table name of the related table<br />
+			You can say a user Has Many files
+		</li>
+		<li><strong>Linking tables</strong> - '<kbd>anothertable</kbd>_<kbd>table</kbd>', ordered in alphabetical order</li>
+	</ul>
+	
+	<p>
+		Examples:
+	</p>
+	
+	<table cellpadding="0" cellspacing="1" border="0" class="tableborder">
+		<tr>
+			<th>Model:</th>
+			<td class="td">user</td>
+			<td class="td">group</td>
+		</tr>
+		<tr>
+			<th>Table:</th>
+			<td class="td">users</td>
+			<td class="td">groups</td>
+		</tr>
+		<tr>
+			<th>id column:</th>
+			<td class="td">id</td>
+			<td class="td">id</td>
+		</tr>
+		<tr>
+			<th>Foreign Key:</th>
+			<td class="td">user_id</td>
+			<td class="td">group_id</td>
+		</tr>
+		<tr>
+			<th>Linking table:</th>
+			<td class="td">groups_users</td>
+			<td class="td"></td>
+		</tr>
+	</table>
+	
+	<h2>All settings</h2>
+	
+	<p>
+		Here is a list of all configuration options,
+		how they are defined, and their fallbacks:
+	</p>
+	
+	<table cellpadding="0" cellspacing="1" border="0" class="tableborder">
+		<tr>
+			<th>Setting:</th>
+			<th>How they are specified:</th>
+		</tr>
+		<tr>
+			<th>Model name:</th>
+			<td class="td">
+				<ol>
+					<li>The class name of the derived class, if it isn't 'IgnitedRecord'</li>
+					<li>The property name of the CodeIgniter property the model is assigned to</li>
+					<li>Singular of <kbd>table name</kbd></li>
+				</ol>
+			</td>
+		</tr>
+		<tr>
+			<th>Table:</th>
+			<td class="td">
+				<ol>
+					<li>The value of the property <dfn>table</dfn></li>
+					<li>Plural of <kbd>model name</kbd></li>
+				</ol>
+			</td>
+		</tr>
+		<tr>
+			<th>id column:</th>
+			<td class="td">
+				<ol>
+					<li>The value of the property <dfn>id_col</dfn></li>
+					<li>'<var>id</var>'</li>
+				</ol>
+			</td>
+		</tr>
+		<tr>
+			<th>Allowed columns:</th>
+			<td class="td">
+				This is for removing unwanted properties on <dfn>save()</dfn>
+				<ol>
+					<li>The value of the property <dfn>columns</dfn></li>
+					<li>The result of SHOW COLUMNS FROM <kbd>table name</kbd></li>
+				</ol>
+			</td>
+		</tr>
+		<tr>
+			<th>The child class:</th>
+			<td class="td">
+				<ol>
+					<li>The data passed to <dfn>child_class()</dfn></li>
+					<li>The value of the property <dfn>child_class</dfn></li>
+					<li>'<var>IR_record</var>'</li>
+				</ol>
+			</td>
+		</tr>
+		<tr>
+			<th>Loaded behaviours:</th>
+			<td class="td">
+				<ol>
+					<li>The data passed to <dfn>act_as()</dfn></li>
+					<li>The value of the property <dfn>act_as</dfn></li>
+					<li>none</li>
+				</ol>
+			</td>
+		</tr>
+		<tr>
+			<th>Has Many</th>
+			<td class="td">
+				<ol>
+					<li>The data passed to <dfn>has_many()</dfn></li>
+					<li>The value of the property <dfn>has_many</dfn> (Need to be set in the class definition)</li>
+					<li>none</li>
+				</ol>
+			</td>
+		</tr>
+		<tr>
+			<th>Has One</th>
+			<td class="td">
+				<ol>
+					<li>The data passed to <dfn>has_one()</dfn></li>
+					<li>The value of the property <dfn>has_one</dfn> (Need to be set in the class definition)</li>
+					<li>none</li>
+				</ol>
+			</td>
+		</tr>
+		<tr>
+			<th>Belongs To</th>
+			<td class="td">
+				<ol>
+					<li>The data passed to <dfn>belongs_to()</dfn></li>
+					<li>The value of the property <dfn>belongs_to</dfn> (Need to be set in the class definition)</li>
+					<li>none</li>
+				</ol>
+			</td>
+		</tr>
+		<tr>
+			<th>Has And Belongs To Many</th>
+			<td class="td">
+				<ol>
+					<li>The data passed to <dfn>habtm()</dfn> and <dfn>has_and_belongs_to_many()</dfn></li>
+					<li>The value of the properties <dfn>habtm</dfn> and <dfn>has_and_belongs_to_many</dfn> (Need to be set in the class definition)</li>
+					<li>none</li>
+				</ol>
+			</td>
+		</tr>
+	</table>
+	
+	<p>
+		Some of these settings are merged, with the most inportant added last.
+	</p>
+	
+	<h2>Relation settings</h2>
+	
+	<p>
+		Read <a href="../use_rel/conf_rel.html">Configure Relations</a> to learn the different ways to specify relationships between tables.
+	</p>
+	
+	<h2>Relation settings defaults</h2>
+	
+	<p>
+		See corresponding relation type for the default values, and how to override them.
+	</p>
+	
+	<h2>Enabling IgnitedQuery</h2>
+	
+	<p>
+		To enable IgnitedQuery, you must first have <kbd>ignitedquery.php</kbd>
+		in your <dfn>application/models/</dfn> directory.
+	</p>
+	
+	<p>
+		Then you set the constant <kbd>IR_USE_IQ</kbd> to <kbd>true</kbd>
+		before you load IgnitedRecord:
+	</p>
+	
+	<code>
+		define('IR_USE_IQ',true);<br />
+		$this-&gt;load-&gt;model('ignitedrecord/ignitedrecord');
+	</code>
+	
+	<p class="important">
+		<strong>Important:</strong>&nbsp; IgnitedQuery is still considered <strong>alpha</strong>
+		software, and may contain bugs and such "features".<br />
+		I have tested it with normal usage, but my "normal usage" may differ from yours,
+		so it may not produce the SQL you expect.<br />
+		Please contact me if you find any bugs, issues or if you have
+		suggestions regarding IgnitedQuery.
+	</p>
+</div>
+
+
+<div id="footer">
+<p><a href="#top">Top of Page</a></p>
+<p><a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord</a>  &nbsp;&middot;&nbsp; Copyright &#169; 2008 &nbsp;&middot;&nbsp; Martin Wernstahl</p>
+<p><a href="http://codeigniter.com">CodeIgniter</a> &nbsp;&middot;&nbsp; Copyright &#169; 2006-2008 &nbsp;&middot;&nbsp; <a href="http://ellislab.com/">Ellislab, Inc.</a></p>
+</div>
+
+
+</body>
+</html>

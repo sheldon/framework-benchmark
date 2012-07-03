@@ -1,0 +1,193 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv='expires' content='-1' />
+	<meta http-equiv= 'pragma' content='no-cache' />
+	
+	<title>Creating Models - IgnitedRecord User Guide Version 0.2.0</title>
+	
+	<link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+	<link rel="Shortcut Icon" href="../images/favicon.ico">
+	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+	
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../nav.js"></script>
+	<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+	$('#nav').hide();
+	$('#toggle_toc').click(function(){
+		$('#nav').slideToggle();
+	})
+});
+	</script>
+</head>
+<body>
+<div id="nav">
+	<script type="text/javascript">menu('../');</script>
+</div>
+<div id="nav2"><a name="top"></a><a id="toggle_toc"><img src="../images/nav_toggle.jpg" width="153" height="44" border="0" title="Toggle Table of Contents" alt="Toggle Table of Contents" /></a></div>
+<div id="masthead">
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td><h1>IgnitedRecord User Guide Version 0.2.0</h1></td>
+<td id="breadcrumb_right"><a href="../toc.html">Table of Contents Page</a></td>
+</tr>
+</table>
+</div>
+<!-- END NAVIGATION -->
+
+
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td id="breadcrumb">
+<a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord Home</a> &nbsp;&#8250;&nbsp; IgnitedRecord User Guide &nbsp;&#8250;&nbsp; Creating Models
+</td>
+<td id="searchbox"></td>
+</tr>
+</table>
+
+<div id="content">
+	<h1>Creating Models</h1>
+	
+	<p>
+		To use IgnitedRecord you have to create a Model.<br />
+		A model in IgnitedRecord is the same as a model in CodeIgnter,
+		with the difference that IgnitedRecord models extend <kbd>IgnitedRecord</kbd>
+		and CodeIgniter models extend <kbd>Model</kbd>.
+	</p>
+	
+	<p>
+		The differences are these:
+	</p>
+	
+	<ul>
+		<li>
+			<kbd>IgnitedRecord</kbd> only load the database library into it's
+			<bd>db</bd> property whereas the <kbd>Model</kbd> loads all data from
+			the CodeIgniter global object.
+		</li>
+		<li>
+			<kbd>IgnitedRecord</kbd> provides a lot of methods for fetching,
+			saving, deleting, and linking data, and by extending
+			<kbd>IgnitedRecord</kbd> your classes will also have these methods.
+		</li>
+	</ul>
+	
+	<p>
+		To create an IgnitedRecord model, you have three choises:
+	</p>
+	
+	<ul>
+		<li>Extending <kbd>IgnitedRecord</kbd>, creating a new class</li>
+		<li>Create an instance of <kbd>IgnitedRecord</kbd> with <dfn>factory()</dfn></li>
+		<li>Create an instance of <kbd>IgnitedRecord</kbd> from YAML with <dfn>yamlfactory()</dfn></li>
+	</ul>
+	
+	<h2>Extending IgnitedRecord</h2>
+	
+	<p>
+		This is the easiest model you can make with IgnitedRecord:
+	</p>
+	
+	<code>
+		&lt;?php<br />
+		class page extends IgnitedRecord{}<br />
+		<br />
+		// end of file /application/models/page.php
+	</code>
+	
+	<p>
+		Is that all? you may ask.<br />
+		Of course! That is everything you have to do to create a model with IgnitedRecord.<br />
+	</p>
+	
+	<p>
+		The model above links itself to the pages table in the database,
+		but it doesn't do anything fancy.<br />
+		Just a plain IgnitedRecord model which you can use to fetch, save,
+		manipulate and delete data with.
+	</p>
+	
+	<p>
+		To specify settings, define them as properties in the derived class with
+		prepended double underscores ('__').<br />
+		See the <a href="../inst/config.html">Configuration</a> page for information
+		on all the available options.
+	</p>
+	
+	<p>
+		You can also specify settings with the use of methods (or properties, excluding the relations),
+		after the instantiation of the model.
+	</p>
+	
+	<h2>The factory(<var>table</var> [, <var>settings</var>]) method</h2>
+	
+	<p>
+		The factory method creates objects on the fly (not new classes) which are
+		asociated to the table <var>table</var>, and populated with the properties
+		in <var>settings</var>.<br />
+		The <dfn>factory()</dfn> method can be called statically.
+	</p>
+	
+	<p>
+	 	Example:
+	</p>
+	
+	<code>
+		$this->post = IgnitedRecord::factory('posts');<br />
+		$posts = $this->post->find_all();
+	</code>
+	
+	<p>
+		It is simpler than the example above!<br />
+		But if you use the model in many controllers (and the model uses relations)
+		it will probably better to store the data in separate classes or in YAML files.
+	</p>
+	
+	<h2>The yamlfactory(<var>file_name</var>) method</h2>
+	
+	<p>
+		This method is almost like <dfn>factory()</dfn>, with the exception that
+		all settings come from a <abbr title="YAML Ain't a Markup Language">YAML</abbr> file / string.
+	</p>
+	
+	<p>
+		The <var>file_name</var> parameter is either a string (contains <kbd>\n</kbd>)
+		or a filename (does <b>not</b> contain <kbd>\n</kbd>).
+	</p>
+	
+	<p>
+		Example YAML:
+	</p>
+	
+	<code>
+		table: users &nbsp;&nbsp;&nbsp;# necessary<br />
+		id_col: pk &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#
+		everything else is optional and defined like normal (but defined in YAML :) )<br />
+		has_many: posts<br />
+		habtm:<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;name: projects<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;join_table: project_assignments
+	</code>
+	
+	<p>
+		Example code:
+	</p>
+	
+	<code>
+		$this->user = IgnitedRecord::yamlfactory(APPPATH.'definitions/user.yaml');<br />
+		$users = $this->user->find_all();
+	</code>
+</div>
+
+
+<div id="footer">
+<p><a href="#top">Top of Page</a></p>
+<p><a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord</a>  &nbsp;&middot;&nbsp; Copyright &#169; 2008 &nbsp;&middot;&nbsp; Martin Wernstahl</p>
+<p><a href="http://codeigniter.com">CodeIgniter</a> &nbsp;&middot;&nbsp; Copyright &#169; 2006-2008 &nbsp;&middot;&nbsp; <a href="http://ellislab.com/">Ellislab, Inc.</a></p>
+</div>
+
+
+</body>
+</html>

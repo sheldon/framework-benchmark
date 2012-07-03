@@ -1,0 +1,210 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv='expires' content='-1' />
+	<meta http-equiv= 'pragma' content='no-cache' />
+	
+	<title>The Tree Behaviour - IgnitedRecord User Guide Version 0.2.0</title>
+	
+	<link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+	<link rel="Shortcut Icon" href="../images/favicon.ico">
+	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+	
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../nav.js"></script>
+	<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+	$('#nav').hide();
+	$('#toggle_toc').click(function(){
+		$('#nav').slideToggle();
+	})
+});
+	</script>
+</head>
+<body>
+<div id="nav">
+	<script type="text/javascript">menu('../');</script>
+</div>
+<div id="nav2"><a name="top"></a><a id="toggle_toc"><img src="../images/nav_toggle.jpg" width="153" height="44" border="0" title="Toggle Table of Contents" alt="Toggle Table of Contents" /></a></div>
+<div id="masthead">
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td><h1>IgnitedRecord User Guide Version 0.2.0</h1></td>
+<td id="breadcrumb_right"><a href="toc.html">Table of Contents Page</a></td>
+</tr>
+</table>
+</div>
+<!-- END NAVIGATION -->
+
+
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td id="breadcrumb">
+<a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord Home</a> &nbsp;&#8250;&nbsp; IgnitedRecord User Guide &nbsp;&#8250;&nbsp; The Tree Behaviour
+</td>
+<td id="searchbox"></td>
+</tr>
+</table>
+
+<div id="content">
+	<h1>The Tree Behaviour</h1>
+	
+	<p>
+		The Tree behaviour is a behaviour which will simplify things when dealing
+		with Modified Preorder Tree Traversal trees (or MPTT).
+	</p>
+	
+	<p>
+		This behaviour is built on top of the tree model
+		<a href="http://codeigniter.com/forums/viewthread/74114/">MPTtree</a>
+		and requires it to be installed in <dfn>application/models/</dfn>
+		or loaded before loading this behaviour.
+	</p>
+	
+	<p>
+		This behaviour puts it's methods under the property named <kbd>tree</kbd>.
+	</p>
+	
+	<h2>Methods provided to <kbd>IgnitedRecord</kbd></h2>
+	
+	<h3>xpath(<var>path</var>, <var>separator</var> = '/')</h3>
+	
+	<p>
+		Works exactly like MPTtree's <dfn>xpath()</dfn> method,
+		with the exception of returning an <kbd>IR_record</kbd> instead of an array.
+	</p>
+	
+	<h2>Methods provided to <kbd>IR_record</kbd></h2>
+	
+	<h3>is_root()</h3>
+	
+	<p>
+		Returns <kbd>true</kbd> if the node is a root node.
+	</p>
+	
+	<h3>is_orphan()</h3>
+	
+	<p>
+		Returns <kbd>true</kbd> if the node is not part of the tree.
+	</p>
+	
+	<h3>root()</h3>
+	
+	<p>
+		Returns the root node of the tree.
+	</p>
+	
+	<h3>parent()</h3>
+	
+	<p>
+		Returns the parent of the node, false if this is the root or if no root is found.
+	</p>
+	
+	<h3>children()</h3>
+	
+	<p>
+		Returns the children of the node.
+	</p>
+	
+	<h3>has_children()</h3>
+	
+	<p>
+		Returns <kbd>true</kbd> if the node has children.
+	</p>
+	
+	<h3>count_children()</h3>
+	
+	<p>
+		Returns the number of children this node has.
+	</p>
+	
+	<h3>is_child_of(<var>node</var>)</h3>
+	
+	<p>
+		Returns <kbd>true</kbd> if the record is a child of <var>node</var>.
+	</p>
+	
+	<h3>descendants()</h3>
+	
+	<p>
+		Returns all descendants of the node.
+	</p>
+	
+	<h3>count_descendants()</h3>
+	
+	<p>
+		Returns the number of descendants the node has.
+	</p>
+	
+	<h3>is_descendant of(<var>node</var>)</h3>
+	
+	<p>
+		Returns <kbd>true</kbd> if the record is a descendant of <var>node</var>.
+	</p>
+	
+	<h3>path(<var>true_path</var> = false)</h3>
+	
+	<p>
+		Returns the path to this node in an array, if <var>true_path</var> is set to
+		<kbd>true</kbd>, the root node is included.
+	</p>
+	
+	<h3>xpath(<var>path</var>, <var>separator</var> = '/', <var>relative</var> = true)</h3>
+	
+	<p>
+		Works almost exactly like MPTtree's <dfn>xpath()</dfn> method,
+		with the exception of returning a <kbd>IR_record</kbd> instead of an array,
+		and the path is relative to this node unless <var>relative</var> is set to <kbd>false</kbd>
+	</p>
+	
+	<h3>insert_as_root()</h3>
+	
+	<p>
+		Sets this record as the root node. Returns <kbd>true</kbd> if it succeeds,
+		<kbd>false</kbd> if this record already is part of the tree or if a root node
+		already exists.
+	</p>
+	
+	
+	<p>
+		Inserts this record above <var>node</var>. Returns <kbd>true</kbd> upon success.
+	</p>
+	
+	<h3>Insert methods:</h3>
+	
+	<p>
+		These methods inserts the record in relation of <var>node</var>, returns <kbd>true</kbd> upon success:
+	</p>
+	
+	<ul>
+		<li>insert_above(<var>node</var>)</li>
+		<li>insert_below(<var>node</var>)</li>
+		<li>insert_as_first_child_of(<var>node</var>)</li>
+		<li>insert_as_last_child_of(<var>node</var>)</li>
+	</ul>
+	
+	<h3>Move methods:</h3>
+	
+	<p>
+		These methods moves the record in relation to <var>node</var>, returns <kbd>true</kbd> upon success:
+	</p>
+	
+	<ul>
+		<li>move_above(<var>node</var>)</li>
+		<li>move_below(<var>node</var>)</li>
+		<li>move_as_first_child_of(<var>node</var>)</li>
+		<li>move_as_last_child_of(<var>node</var>)</li>
+	</ul>
+</div>
+
+
+<div id="footer">
+<p><a href="#top">Top of Page</a></p>
+<p><a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord</a>  &nbsp;&middot;&nbsp; Copyright &#169; 2008 &nbsp;&middot;&nbsp; Martin Wernstahl</p>
+<p><a href="http://codeigniter.com">CodeIgniter</a> &nbsp;&middot;&nbsp; Copyright &#169; 2006-2008 &nbsp;&middot;&nbsp; <a href="http://ellislab.com/">Ellislab, Inc.</a></p>
+</div>
+
+
+</body>
+</html>

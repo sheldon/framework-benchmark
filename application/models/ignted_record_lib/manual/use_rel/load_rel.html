@@ -1,0 +1,312 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv='expires' content='-1' />
+	<meta http-equiv= 'pragma' content='no-cache' />
+	
+	<title>Loading Related Objects - IgnitedRecord User Guide Version 0.2.0</title>
+	
+	<link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+	<link rel="Shortcut Icon" href="../images/favicon.ico">
+	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+	
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../nav.js"></script>
+	<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+	$('#nav').hide();
+	$('#toggle_toc').click(function(){
+		$('#nav').slideToggle();
+	})
+});
+	</script>
+</head>
+<body>
+<div id="nav">
+	<script type="text/javascript">menu('../');</script>
+</div>
+<div id="nav2"><a name="top"></a><a id="toggle_toc"><img src="../images/nav_toggle.jpg" width="153" height="44" border="0" title="Toggle Table of Contents" alt="Toggle Table of Contents" /></a></div>
+<div id="masthead">
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td><h1>IgnitedRecord User Guide Version 0.2.0</h1></td>
+<td id="breadcrumb_right"><a href="../toc.html">Table of Contents Page</a></td>
+</tr>
+</table>
+</div>
+<!-- END NAVIGATION -->
+
+
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td id="breadcrumb">
+<a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord Home</a> &nbsp;&#8250;&nbsp; IgnitedRecord User Guide &nbsp;&#8250;&nbsp; Loading Related Objects
+</td>
+<td id="searchbox"></td>
+</tr>
+</table>
+
+<div id="content">
+	<h1>Loading Related Objects</h1>
+	
+	<p>
+		The records in one table are linked to records in another table,
+		and their relation settings are defined.<br />
+		Now you may ask: How can I get the related records of this object?
+	</p>
+	
+	<p>
+		There are two answers:
+		<ul>
+			<li>Use the <kbd>IR_record</kbd> method <dfn>related()</dfn></li>
+			<li>Use the <kbd>IgnitedRecord</kbd>/<kbd>IR_RelQuery</kbd> method <dfn>join_related()</dfn> (only for Has One and Belongs To)</li>
+		</ul>
+	</p>
+	
+	<h2>The <dfn>related()</dfn> method</h2>
+	
+	<p>
+		The <dfn>related()</dfn> method returns an <kbd>IR_RelQuery</kbd> object.
+		The <kbd>IR_RelQuery</kbd> contains a modifiable pre-made query to fetch the related objects,
+		which is done by calling the <dfn>get()</dfn> method.
+	</p>
+	
+	<p>
+		Example:
+	</p>
+	
+	<code>
+		$rec =&amp; $this-&gt;user-&gt;find(1);<br />
+		$q =&amp; $rec-&gt;related('posts');<br />
+		<br />
+		foreach($q-&gt;get() as $post){<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;echo $post-&gt;text;<br />
+		}<br />
+	</code>
+	
+	<p>
+		PHP 5 version (with chaining):
+	</p>
+	
+	<code>
+		$rec =&amp; $this-&gt;user-&gt;find(1);<br />
+		<br />
+		foreach($rec-&gt;related('posts')-&gt;get() as $post){<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;echo $post-&gt;text;<br />
+		}<br />
+	</code>
+	
+	<p>
+		The first and only parameter of <dfn>related()</dfn> is the relation name.<br />
+		If no relation is found, <kbd>false</kbd> is returned from the <dfn>IR_RelQuery::get()</dfn> method.
+		(Which you don't have to worry about, unless your relations may vary during a request (usually, you have all relations already set up in your constructor))
+	</p>
+	
+	<h3>Customize the queries</h3>
+	
+	<p>
+		All examples above only fetches the related objects witout any concern
+		of thir order, or any other conditions that should be met.<br />
+		By letting <kbd>IR_RelQuery</kbd> extend <kbd>IR_base</kbd> I have enabled
+		easy customization of relation fetching queries,
+		it is as easy as customizing ordinary queries with CodeIgniter's ActiveRecord implementation.
+	</p>
+	
+	<p>
+		The query is usually prepared with a from part, a where part and a few settings
+		for the altered <dfn>get()</dfn> metod (to utilize the correct return type).<br />
+		Here is an example of what SQL it will create:
+	</p>
+	
+	<code>
+		$rec-&gt;related('posts')-&gt;get();<br />
+		// creates:<br />
+		// SELECT *<br />
+		// FROM `posts`<br />
+		// WHERE `user_id` = 3
+	</code>
+	
+	<p>
+		A few examples of more <i>interesting</i> queries:
+	</p>
+	
+	<code>
+		$rec-&gt;related('posts')-&gt;order_by('title', 'desc')-&gt;like('title', 'help')-&gt;get();<br />
+	</code>
+	
+	<p>
+		Provided these conditions are met:
+		<ul>
+			<li>$rec has id 3</li>
+			<li>$rec relates with a Has Many relationship to the table posts</li>
+			<li>The foreign key column of the posts table is 'user_id'</li>
+		</ul>
+		The query above would produce:
+	</p>
+	
+	<code>
+		SELECT *<br />
+		FROM `posts`<br />
+		WHERE `user_id` = 3 AND `title` LIKE '%help%'<br />
+		ORDER BY `title` DESC
+	</code>
+	
+	<p>
+		This is one without chaining, and it is somewhat complex:
+	</p>
+	
+	<code>
+		$q =&amp; $rec-&gt;related('customers');<br />
+		$q-&gt;from('projects'); // add another table (be careful with column name collisions)<br />
+		$q-&gt;select('customers.id') // the id column of the related records must ALWAYS be selected, otherwise the cerated object won't link properly to the table rows<br />
+		$q-&gt;select('customers.company_id'); // we don't want to forget the relating column, do we?<br />
+		$q-&gt;select('customer.name, project.name AS proj_name'); // remember to not let them collide<br />
+		$q-&gt;where('projects.id >', 24);<br />
+		$q-&gt;order_by('title', 'asc');<br />
+		$q-&gt;get();
+	</code>
+	
+	<p>
+		Would produce:
+	</p>
+	
+	<code>
+		SELECT `customers`.`id`, `customers`.`company_id`, `customers`.`name`, `projects`.`name` AS proj_name<br />
+		FROM `customers`, `projects`<br />
+		WHERE `company_id` = 4 AND `projects`.`id` > 24<br />
+		ORDER BY `title` ASC
+	</code>
+	
+	<h2>join_related(<var>rel_name</var> [, <var>columns</var> = false])</h2>
+	
+	<p class="important">
+		<strong>Important:</strong>&nbsp; This method requires that IgnitedRecord
+		must be configured to utilize IgnitedQuery as the SQL-string builder,<br />
+		see <a href="../inst/config.html">Configure IgnitedRecord</a>.
+	</p>
+	
+	<p>
+		The <dfn>join_related()</dfn> method produces a subquery which will fetch
+		all related columns and prefix them with their relation name.
+		Then it adds this subquery to the query in construction and then a WHERE
+		part that only allows the "right" records to be selected.
+	</p>
+	
+	<p>
+		The <var>columns</var> parameter specifies which columns to fetch,
+		if none are specified, IgnitedRecord fetches all columns.<br />
+		If a necessary id column is missing, <dfn>join_related()</dfn> add this one automatically.
+	</p>
+	
+	<p>
+		Example:
+	</p>
+	
+	<code>
+		$this->comment->join_related('user');<br />
+		$rec =&amp; $this->comment->find(1):<br />
+		print_r($rec);<br />
+		<br />
+		/* prints something like:<br />
+		<br />
+		IR_record Object (<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;[__table] =&gt; string(7) &quot;threads&quot;<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;[__id] =&gt; string(1) &quot;1&quot;<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;[name] =&gt; string(10) &quot;new thread&quot;<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;[data] =&gt; string(13) &quot;hello comment&quot;<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;[user_id] =&gt; string(1) &quot;3&quot;<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;[user_name] =&gt; string(3) &quot;foo&quot;<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;[user_email] =&gt; string(1) &quot;foo@example.com&quot;<br />
+		)
+	</code>
+	
+	<p class="important">
+		<strong>Important:</strong>&nbsp; This is not a "real" JOIN,
+		and it cannot fetch records which are not related to the "joining" relation.
+	</p>
+	
+	<p>
+		If the tables look like this:
+	</p>
+	
+	<code>
+		<!--
+		comments
+		=====================
+		text          user_id
+		---------------------
+		I am done!          1
+		That was awesome!   2
+		
+		users
+		=====================
+		name               id
+		---------------------
+		admin               1
+		foo                 2
+		bar                 3
+		-->
+		comments<br />
+		=====================<br />
+		text&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;user_id<br />
+		---------------------<br />
+		I am done!&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1<br />
+		That was awesome!&nbsp;&nbsp; 2<br />
+		<br />
+		users<br />
+		=====================<br />
+		name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; id<br />
+		---------------------<br />
+		admin&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1<br />
+		foo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2<br />
+		bar&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3
+	</code>
+	
+	<p>
+		Then when <dfn>join_related</dfn> is used in a query can only fetch
+		admin and foo, but not bar.<br />
+		This is because it uses a WHERE that looks like this:
+	</p>
+	
+	<code>
+		... WHERE `id` = `comment_user_id`
+	</code>
+	
+	<p>
+		The result of join_related('comment') on the user model will result in this "base" query (in this case, depends on the columns):
+	</p>
+	
+	<code>
+		SELECT *<br />
+		FROM<br />
+		(<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;SELECT `id` AS comment_id, `text` AS comment_text, `user_id` AS comment_user_id<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;FROM `comments`<br />
+		) AS related_comment,<br />
+		`users`<br />
+		WHERE `users`.`id` = related_comment.comment_user_id<br />
+	</code>
+	
+	<p class="important">
+		<strong>Important:</strong>&nbsp; If you edit the joined properties,
+		the changes to the joined properties will <strong>not</strong> propagate to the database.<br />
+		(You have to manually fetch and edit the related record instead.)
+	</p>
+	
+	<p>
+		The <dfn>join_related()</dfn> method can also be used on <kbd>IR_RelQuery</kbd> objects,
+		to join related records when fetching related records.
+	</p>
+</div>
+
+
+<div id="footer">
+<p><a href="#top">Top of Page</a></p>
+<p><a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord</a>  &nbsp;&middot;&nbsp; Copyright &#169; 2008 &nbsp;&middot;&nbsp; Martin Wernstahl</p>
+<p><a href="http://codeigniter.com">CodeIgniter</a> &nbsp;&middot;&nbsp; Copyright &#169; 2006-2008 &nbsp;&middot;&nbsp; <a href="http://ellislab.com/">Ellislab, Inc.</a></p>
+</div>
+
+
+</body>
+</html>

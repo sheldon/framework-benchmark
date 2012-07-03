@@ -1,0 +1,128 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv='expires' content='-1' />
+	<meta http-equiv= 'pragma' content='no-cache' />
+	
+	<title>How To Install - IgnitedRecord User Guide Version 0.2.0</title>
+	
+	<link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+	<link rel="Shortcut Icon" href="../images/favicon.ico">
+	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+	
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../nav.js"></script>
+	<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+	$('#nav').hide();
+	$('#toggle_toc').click(function(){
+		$('#nav').slideToggle();
+	})
+});
+	</script>
+</head>
+<body>
+<div id="nav">
+	<script type="text/javascript">menu('../');</script>
+</div>
+<div id="nav2"><a name="top"></a><a id="toggle_toc"><img src="../images/nav_toggle.jpg" width="153" height="44" border="0" title="Toggle Table of Contents" alt="Toggle Table of Contents" /></a></div>
+<div id="masthead">
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td><h1>IgnitedRecord User Guide Version 0.2.0</h1></td>
+<td id="breadcrumb_right"><a href="../toc.html">Table of Contents Page</a></td>
+</tr>
+</table>
+</div>
+<!-- END NAVIGATION -->
+
+
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td id="breadcrumb">
+<a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord Home</a> &nbsp;&#8250;&nbsp; IgnitedRecord User Guide &nbsp;&#8250;&nbsp; How To Install
+</td>
+<td id="searchbox"></td>
+</tr>
+</table>
+
+<div id="content">
+	<h1>How To Install IgnitedRecord</h1>
+	
+	<p class="important">
+		<strong>Important:</strong>&nbsp; If you use <kbd>PHP 4</kbd> you <strong>must</strong>
+		also read the <a href="php4.html">PHP 4 specific</a> instructions,
+		because there are a few differences between PHP 4 and PHP 5.
+	</p>
+	
+	<h2>Basic Installation</h2>
+	
+	<p>
+		Drop the <dfn>ignitedrecord</dfn> folder into your <dfn>models</dfn> dir, and you're ready to go!
+	</p>
+	
+	<h2>IgnitedQuery</h2>
+	
+	<p>
+		IgnitedQuery is a SQL string builder, like CodeIgniter's ActiveRecord
+		implementation. It has support for building multiple queries at the
+		same time (CI's AR only allows one at a time) through multiple instances.
+		It also has support for nested WHERE statements and <a href="../misc/ir_subqueries.html">subqueries</a>.
+	</p>
+	
+	<p>
+		Optional, but makes it easier when fetching a lot of objects
+		(no need to worry about queries interfering with eachother)
+		and provides a bit more functionality.
+	</p>
+	
+	<h2>The custom Loader</h2>
+	
+	<p>
+		The custom loader is a class which extends the CI_Loader and makes it easier to instantiate and load IgnitedRecord.<br />
+		Is is an optional component, and not needed for normal use. But it simplifies things a bit.
+	<p>
+	
+	<h2>YAYparser</h2>
+	
+	<p>
+		<a href="http://codeigniter.com/wiki/YAYparser/" title="Yet Another YAML parser">YAYparser</a> is a YAML parser which
+		IgnitedRecord uses to parse yaml table definitions (which stores the data instead of pure PHP).<br />
+		It is used by <dfn>yamlfactory()</dfn> which makes it optional, unless you want to be able to save table definitions in YAML files.
+	</p>
+	
+	<h2>Complete Installation - Step by Step</h2>
+	
+	<ol>
+		<li>Drop the folder <dfn>application/models/ignitedrecord</dfn> into your <dfn>application/models</dfn> dir.</li>
+		<li>If you want IgnitedQuery:<br />
+			<p style="margin: 5px 0 0 20px;">
+				Drop the <kbd>ignitedquery.php</kbd> file into <dfn>application/libraries</dfn>.
+			</p>
+		</li>		
+		<li>
+			If you want the custom loader:<br />
+			<ul>
+				<li>Drop the <kbd>MY_Loader.php</kbd> file into <dfn>application/libraries</dfn>.</li>
+				<li>
+					If you already have a custom <kbd>MY_Loader.php</kbd>, or if you have a custom <kbd>Loader.php</kbd>
+					you should copy the <dfn>orm()</dfn> method into that loader.
+				</li>
+			</ul>
+		</li>
+		<li>If you plan to use <dfn>yamlfactory()</dfn>, copy <kbd>yayparser_helper.php</kbd> into your <dfn>application/helpers</dfn> dir.</li>
+		<li>If you use PHP 4, read the <a href="php4.html">PHP 4 specific instructions</a>.</li>
+	</ol>
+</div>
+
+
+<div id="footer">
+<p><a href="#top">Top of Page</a></p>
+<p><a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord</a>  &nbsp;&middot;&nbsp; Copyright &#169; 2008 &nbsp;&middot;&nbsp; Martin Wernstahl</p>
+<p><a href="http://codeigniter.com">CodeIgniter</a> &nbsp;&middot;&nbsp; Copyright &#169; 2006-2008 &nbsp;&middot;&nbsp; <a href="http://ellislab.com/">Ellislab, Inc.</a></p>
+</div>
+
+
+</body>
+</html>

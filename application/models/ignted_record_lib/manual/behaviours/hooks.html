@@ -1,0 +1,421 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv='expires' content='-1' />
+	<meta http-equiv= 'pragma' content='no-cache' />
+	
+	<title>Hooks / Triggers - IgnitedRecord User Guide Version 0.2.0</title>
+	
+	<link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+	<link rel="Shortcut Icon" href="../images/favicon.ico">
+	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+	
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../nav.js"></script>
+	<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+	$('#nav').hide();
+	$('#toggle_toc').click(function(){
+		$('#nav').slideToggle();
+	})
+});
+	</script>
+</head>
+<body>
+<div id="nav">
+	<script type="text/javascript">menu('../');</script>
+</div>
+<div id="nav2"><a name="top"></a><a id="toggle_toc"><img src="../images/nav_toggle.jpg" width="153" height="44" border="0" title="Toggle Table of Contents" alt="Toggle Table of Contents" /></a></div>
+<div id="masthead">
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td><h1>IgnitedRecord User Guide Version 0.2.0</h1></td>
+<td id="breadcrumb_right"><a href="../toc.html">Table of Contents Page</a></td>
+</tr>
+</table>
+</div>
+<!-- END NAVIGATION -->
+
+
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td id="breadcrumb">
+<a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord Home</a> &nbsp;&#8250;&nbsp; IgnitedRecord User Guide &nbsp;&#8250;&nbsp; Hooks / Triggers
+</td>
+<td id="searchbox"></td>
+</tr>
+</table>
+
+<div id="content">
+	<h1>Hooks / Triggers</h1>
+	
+	<h2>What is a hook?</h2>
+	
+	<p>
+		A hook is a place where you can add your own code to execute between different parts of IgnitedRecord, modifying it's behaviour.<br />
+		Trigger is maybe a more fitting description, but you have a hook and you attach your code to the hook.
+	</p>
+	
+	<p>
+		Sort of hanging your code there and then when the hook is called, the code on the hook will be called. :-P
+	</p>
+	
+	<h2>How does it work?</h2>
+	
+	<p>
+		Hooks work by calling a specific method in those places where users should be able to add their own code.<br />
+		In IgnitedRecord are calls to <dfn>hook()</dfn> scattered throughout the code, enabling you to modify most of the behaviour.
+	</p>
+	
+	<p>
+		When the <dfn>hook()</dfn> method recieves a call, it checks if a function has been attached to that hook.
+		If something is attached, it will be executed with the arguments supplied to <dfn>hook()</dfn>.
+		If not, nothing will be done.
+	</p>
+	
+	<h2>How do I use it?</h2>
+	
+	<p>
+		To add some code to a hook you first have to place the code in a separate function/method which you then can add to the hook.<br />
+		The second step is to register your function with the help of the <dfn>add_hook()</dfn> method:
+	</p>
+	
+	<p><strong>add_hook('<var>hook_name</var>', '<var>function_name</var>', <var>priority</var> = 10)</strong></p>
+	
+	<p>
+	Method variant:<br />
+	<strong>
+		add_hook('<var>hook_name</var>', array(<var>object</var>, '<var>method_name</var>'), <var>priority</var> = 10)
+	</strong>
+	</p>
+	
+	<p>
+		The higher the priority number, the lower priority the hooked code will have.
+		The hooked code will be run in order with the lowest priority number first
+		(and if two hooks have the same priority, the one added first will be run first).
+	</p>
+	
+	<p>
+		Example:
+	</p>
+
+	<code>
+function add_prop(&amp;$object){ // the ampersand is important, it is required for the reference to work (at least for scalars, depending on PHP version)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;$object-&gt;added_prop = 'We have added this!';<br />
+}<br />
+$this-&gt;page-&gt;add_hook('post_get',array($this,'add_prop'));<br />
+$rec = $this-&gt;page-&gt;get();<br />
+echo $rec-&gt;added_prop; // will echo "We have added this!"
+	</code>
+	
+	<h2>Available Hooks:</h2>
+
+	<p>
+		&nbsp;
+	</p>
+
+	<table cellpadding="0" cellspacing="1" border="0" class="tableborder">
+		<tr>
+			<th>Hook</th>
+			<th>Parameters</th>
+			<th>Description</th>
+		</tr>
+		<tr>
+			<td class="td">pre_get</td>
+			<td class="td"></td>
+			<td class="td">This hook is run before the <dfn>get()</dfn> method does anything</td>
+		</tr>
+		<tr>
+			<td class="td">post_get</td>
+			<td class="td">
+				<ul>
+					<li>reference to generated object</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run after the <dfn>get()</dfn> method has fetched and instantiated data</td>
+		</tr>
+		<tr>
+			<td class="td">pre_find</td>
+			<td class="td">
+				<ul>
+					<li>find id</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run before the <dfn>find()</dfn> method does anything</td>
+		</tr>
+		<tr>
+			<td class="td">post_find</td>
+			<td class="td">
+				<ul>
+					<li>find id</li>
+					<li>reference to generated object</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run after the <dfn>find()</dfn> method has fetched and instantiated data</td>
+		</tr>
+		<tr>
+			<td class="td">pre_find_by</td>
+			<td class="td">
+				<ul>
+					<li>reference to where array</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run before the <dfn>find_by()</dfn> method does anything</td>
+		</tr>
+		<tr>
+			<td class="td">post_find_by</td>
+			<td class="td">
+				<ul>
+					<li>where array</li>
+					<li>reference to generated object</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run after the <dfn>find_by()</dfn> method has fetched and instantiated data</td>
+		</tr>
+		<tr>
+			<td class="td">pre_find_by_sql</td>
+			<td class="td">
+				<ul>
+					<li>reference to sql string</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run before the <dfn>find_by_sql()</dfn> method does anything</td>
+		</tr>
+		<tr>
+			<td class="td">post_find_by_sql</td>
+			<td class="td">
+				<ul>
+					<li>sql string</li>
+					<li>reference to generated object</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run after the <dfn>find_by_sql()</dfn> method has fetched and instantiated data</td>
+		</tr>
+		<tr>
+			<td class="td">pre_find_all</td>
+			<td class="td"></td>
+			<td class="td">This hook is run before the <dfn>find_all()</dfn> method does anything</td>
+		</tr>
+		<tr>
+			<td class="td">post_find_all</td>
+			<td class="td">
+				<ul>
+					<li>reference to return array</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run after the <dfn>find_all()</dfn> method has fetched and instantiated data</td>
+		</tr>
+		<tr>
+			<td class="td">pre_find_all_by</td>
+			<td class="td">
+				<ul>
+					<li>reference to where array</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run before the <dfn>find_all_by()</dfn> method does anything</td>
+		</tr>
+		<tr>
+			<td class="td">post_find_all_by</td>
+			<td class="td">
+				<ul>
+					<li>where array</li>
+					<li>reference to return array</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run after the <dfn>find_all_by()</dfn> method has fetched and instantiated data</td>
+		</tr>
+		<tr>
+			<td class="td">pre_find_all_by_sql</td>
+			<td class="td">
+				<ul>
+					<li>reference to sql string</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run before the <dfn>find_all_by_sql()</dfn> method does anything</td>
+		</tr>
+		<tr>
+		<td class="td">post_find_all_by_sql</td>
+			<td class="td">
+				<ul>
+					<li>sql string</li>
+					<li>reference to return array</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run after the <dfn>find_all_by_sql()</dfn> method has fetched and instantiated data</td>
+		</tr>
+		<tr>
+			<td class="td">post_new_record</td>
+			<td class="td">
+				<ul>
+					<li>reference to new object</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run after the <dfn>new_record()</dfn> method has instantiated data</td>
+		</tr>
+		<tr>
+			<td class="td">pre_instantiate_record</td>
+			<td class="td">
+				<ul>
+					<li>reference to data</li>
+					<li>reference to id data</li>
+					<li>reference to class name</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run before the <dfn>dbobj2ORM()</dfn> method have created a new instance with the data</td>
+		</tr>
+		<tr>
+			<td class="td">post_instantiate_record</td>
+			<td class="td">
+				<ul>
+					<li>reference to object created</li>
+					<li>reference to data</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run after the <dfn>dbobj2ORM()</dfn> method have created a new instance with the data</td>
+		</tr>
+		<tr>
+			<td class="td">post_instantiate_record_helpers</td>
+			<td class="td">
+				<ul>
+					<li>reference to object created</li>
+					<li>reference to data</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run after the <dfn>dbobj2ORM()</dfn> method have created and assigned helpers and backup data to the new instance</td>
+		</tr>
+		<tr>
+			<td class="td">save_pre_strip_data</td>
+			<td class="td">
+				<ul>
+					<li>reference to object to save</li>
+				</ul>
+			</td>
+			<td class="td">
+				This hook is run before the <dfn>_strip_data()</dfn> method has returned a clean array.<br />
+				If <kbd>false</kbd> is returned, <dfn>save()</dfn> aborts the saving process.
+			</td>
+		</tr>
+		<tr>
+			<td class="td">save_post_strip_data</td>
+			<td class="td">
+				<ul>
+					<li>reference to data array to save</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run after the <dfn>_strip_data()</dfn> method has returned a clean array</td>
+		</tr>
+		<tr>
+			<td class="td">save_pre_insert</td>
+			<td class="td">
+				<ul>
+					<li>reference to data array to save</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run before the <dfn>save()</dfn> method has called <dfn>db::insert()</dfn></td>
+		</tr>
+		<tr>
+			<td class="td">save_post_insert</td>
+			<td class="td">
+				<ul>
+					<li>reference to object which has been inserted</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run after the <dfn>db::insert()</dfn> has inserted the clean data array</td>
+		</tr>
+		<tr>
+			<td class="td">save_pre_update</td>
+			<td class="td">
+				<ul>
+					<li>reference to data array to save</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run before the <dfn>save()</dfn> method has called <dfn>db::update()</dfn></td>
+		</tr>
+		<tr>
+			<td class="td">save_post_update</td>
+			<td class="td">
+				<ul>
+					<li>reference to object which has been updated</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run after the <dfn>db::update()</dfn> has saved the clean data array</td>
+		</tr>
+		<tr>
+			<td class="td">save_abort</td>
+			<td class="td">
+				<ul>
+					<li>reference to object on which the save failed</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run if the <dfn>save()</dfn> method aborts because it has detected that the object is unchanged, empty or if a hook wants to abort</td>
+		</tr>
+		<tr>
+			<td class="td">post_save</td>
+			<td class="td">
+				<ul>
+					<li>reference to object which has been updated</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run after the <dfn>save()</dfn> method has saved the clean data array</td>
+		</tr>
+		<tr>
+			<td class="td">pre_update</td>
+			<td class="td">
+				<ul>
+					<li>reference to object to refresh</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run before the <dfn>update()</dfn> has created the new refreshed object<br />
+				If <kbd>false</kbd> is returned, <dfn>update()</dfn> aborts the update of the object.</td>
+		</tr>
+		<tr>
+			<td class="td">post_update</td>
+			<td class="td">
+				<ul>
+					<li>reference to newly created object</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run after the <dfn>update()</dfn> method has loaded and instantiated the object</td>
+		</tr>
+		<tr>
+			<td class="td">pre_delete</td>
+			<td class="td">
+				<ul>
+					<li>reference to object to be deleted</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run before the <dfn>delete()</dfn> has done anything<br />
+				If <kbd>false</kbd> is returned, <dfn>delete()</dfn> aborts the delete process.</td>
+		</tr>
+		<tr>
+			<td class="td">pre_delete_query</td>
+			<td class="td">
+				<ul>
+					<li>reference to object to be deleted</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run after the <dfn>delete()</dfn> method has removed all relations from the object to be deleted</td>
+		</tr>
+		<tr>
+			<td class="td">post_deleted</td>
+			<td class="td">
+				<ul>
+					<li>reference to deleted object</li>
+				</ul>
+			</td>
+			<td class="td">This hook is run after the <dfn>delete()</dfn> method has deleted the object</td>
+		</tr>
+	</table>
+</div>
+
+
+<div id="footer">
+<p><a href="#top">Top of Page</a></p>
+<p><a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord</a>  &nbsp;&middot;&nbsp; Copyright &#169; 2008 &nbsp;&middot;&nbsp; Martin Wernstahl</p>
+<p><a href="http://codeigniter.com">CodeIgniter</a> &nbsp;&middot;&nbsp; Copyright &#169; 2006-2008 &nbsp;&middot;&nbsp; <a href="http://ellislab.com/">Ellislab, Inc.</a></p>
+</div>
+
+
+</body>
+</html>

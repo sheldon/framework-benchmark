@@ -1,0 +1,198 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv='expires' content='-1' />
+	<meta http-equiv= 'pragma' content='no-cache' />
+	
+	<title>Advanced Filtering - IgnitedRecord User Guide Version 0.2.0</title>
+	
+	<link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+	<link rel="Shortcut Icon" href="../images/favicon.ico">
+	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+	
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../nav.js"></script>
+	<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+	$('#nav').hide();
+	$('#toggle_toc').click(function(){
+		$('#nav').slideToggle();
+	})
+});
+	</script>
+</head>
+<body>
+<div id="nav">
+	<script type="text/javascript">menu('../');</script>
+</div>
+<div id="nav2"><a name="top"></a><a id="toggle_toc"><img src="../images/nav_toggle.jpg" width="153" height="44" border="0" title="Toggle Table of Contents" alt="Toggle Table of Contents" /></a></div>
+<div id="masthead">
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td><h1>IgnitedRecord User Guide Version 0.2.0</h1></td>
+<td id="breadcrumb_right"><a href="../toc.html">Table of Contents Page</a></td>
+</tr>
+</table>
+</div>
+<!-- END NAVIGATION -->
+
+
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td id="breadcrumb">
+<a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord Home</a> &nbsp;&#8250;&nbsp; IgnitedRecord User Guide &nbsp;&#8250;&nbsp; Advanced Filtering
+</td>
+<td id="searchbox"></td>
+</tr>
+</table>
+
+<div id="content">
+	<h1>Advanced Filtering</h1>
+	
+	<p>
+		Sometimes the <dfn>find_by()</dfn> methods are not enough to fetch
+		what you are looking for, or if they doesn't return the records in the right order, then the Advanced Filtering capabilities
+		of IgnitedRecord come in handy:
+	</p>
+	
+	<p>
+		Example:
+	</p>
+	
+	<code>
+		$this-&gt;user-&gt;where_in('name',array('John','David'));<br />
+		$this-&gt;user-&gt;order_by('birthday', 'ASC');<br />
+		$users = $this-&gt;user-&gt;find_all();  // this fetches all records matching the previous conditions
+	</code>
+	
+	<h2>How it works</h2>
+	
+	<p>
+		IgnitedRecord uses CodeIgniter's built in SQL string builder
+		(or the IgnitedQuery SQL string builder library) to create the
+		SQL queries which are interacting with the database.<br />
+		This enables us to easily create fairly advanced SQL without having
+		to worry about escaping data and other SQL hassles.
+	</p>
+	
+	<p>
+		IgnitedRecord is based on a class called <kbd>IR_base</kbd>, which implements
+		all these SQL methods, and there are two variants:
+	</p>
+	
+	<ul>
+		<li>The default variant forwards all calls to the database object of CodeIgniter.</li>
+		<li>
+			The IgnitedQuery variant extends IgnitedQuery, and thus recieves all
+			query-building methods.
+		</li>
+	</ul>
+	
+	<p>
+		To find out how to activate IgnitedQuery, see <a href="../inst/config.html">Configuring IgnitedRecord</a> (at the bottom).
+	</p>
+	
+	<h2>How to use it</h2>
+	
+	<p>
+		To use it, call a CI AR method directly on an IgnitedRecord object.<br />
+		Except for all the get methods (and private ones), all calls are allowed.
+	</p>
+	
+	<p class="important">
+		<strong>Important:</strong>&nbsp; If you use CodeIgniter's AR implementation
+		(default) only <strong>one</strong> query may be built at a time.<br />
+		Otherwise they will interfere with eachother.
+	</p>
+	
+	<p>
+		After every call to one of the following methods, the calls are reset:
+	</p>
+	
+	<ul>
+		<li><dfn>get()</dfn></li>
+		<li><dfn>find()</dfn></li>
+		<li><dfn>find_by()</dfn></li>
+		<li><dfn>find_all()</dfn></li>
+		<li><dfn>find_all_by()</dfn></li>
+	</ul>
+	
+	<h2>What methods can I use?</h2>
+	
+	<p>
+		The methods you can use are the following (all of these are chainable):
+	</p>
+	
+	<ul>
+		<li><strong>dbprefix</strong> (<var>table</var> = '')</li>
+		<li><strong>select</strong> (<var>select</var> = '*', <var>protect_identifiers</var> = TRUE)</li>
+		<li><strong>select_max</strong> (<var>select</var> = '', <var>alias</var>='')</li>
+		<li><strong>select_min</strong> (<var>select</var> = '', <var>alias</var>='')</li>
+		<li><strong>select_avg</strong> (<var>select</var> = '', <var>alias</var>='')</li>
+		<li><strong>select_sum</strong> (<var>select</var> = '', <var>alias</var>='')</li>
+		<li><strong>distinct</strong> (<var>val</var> = TRUE)</li>
+		<li><strong>from</strong> (<var>from</var>)</li>
+		<li><strong>join</strong> (<var>table</var>, <var>cond</var>, <var>type</var> = '')</li>
+		<li><strong>where</strong> (<var>key</var>, <var>value</var> = NULL, <var>escape</var> = TRUE)</li>
+		<li><strong>or_where</strong> (<var>key</var>, <var>value</var> = NULL, <var>escape</var> = TRUE)</li>
+		<li><strong>orwhere</strong> (<var>key</var>, <var>value</var> = NULL, <var>escape</var> = TRUE)</li>
+		<li><strong>where_in</strong> (<var>key</var> = NULL, <var>values</var> = NULL)</li>
+		<li><strong>or_where_in</strong> (<var>key</var> = NULL, <var>values</var> = NULL)</li>
+		<li><strong>where_not_in</strong> (<var>key</var> = NULL, <var>values</var> = NULL)</li>
+		<li><strong>or_where_not_in</strong> (<var>key</var> = NULL, <var>values</var> = NULL)</li>
+		<li><strong>like</strong> (<var>field</var>, <var>match</var> = '', <var>side</var> = 'both')</li>
+		<li><strong>not_like</strong> (<var>field</var>, <var>match</var> = '', <var>side</var> = 'both')</li>
+		<li><strong>or_like</strong> (<var>field</var>, <var>match</var> = '', <var>side</var> = 'both')</li>
+		<li><strong>or_not_like</strong> (<var>field</var>, <var>match</var> = '', <var>side</var> = 'both')</li>
+		<li><strong>orlike</strong> (<var>field</var>, <var>match</var> = '', <var>side</var> = 'both')</li>
+		<li><strong>group_by</strong> (<var>by</var>)</li>
+		<li><strong>groupby</strong> (<var>by</var>)</li>
+		<li><strong>having</strong> (<var>key</var>, <var>value</var> = '', <var>escape</var> = TRUE)</li>
+		<li><strong>orhaving</strong> (<var>key</var>, <var>value</var> = '', <var>escape</var> = TRUE)</li>
+		<li><strong>or_having</strong> (<var>key</var>, <var>value</var> = '', <var>escape</var> = TRUE)</li>
+		<li><strong>order_by</strong> (<var>orderby</var>, <var>direction</var> = '')</li>
+		<li><strong>orderby</strong> (<var>orderby</var>, <var>direction</var> = '')</li>
+		<li><strong>limit</strong> (<var>value</var>, <var>offset</var> = '')</li>
+		<li><strong>offset</strong> (<var>offset</var>)</li>
+		<li><strong>start_cache</strong> ()</li>
+		<li><strong>stop_cache</strong> ()</li>
+		<li><strong>flush_cache</strong> ()</li>
+	</ul>
+	
+	<p>
+		Additionally, these are available when using IgnitedQuery:
+	</p>
+	
+	<ul>
+		<li><strong>select_count</strong> (<var>select</var> = '', <var>alias</var>='', <var>protect_identifiers</var> = true)</li>
+		<li><strong>not_where</strong> (<var>where</var> = false, <var>value</var> = null, <var>escape</var> = true)</li>
+		<li><strong>or_not_where</strong> (<var>where</var> = false, <var>value</var> = null, <var>escape</var> = true)</li>
+	</ul>
+	
+	<p>
+		There is also a <dfn>reset()</dfn> method, it resets the current read query.
+	</p>
+	
+	<p class="important">
+		<strong>Note:</strong>&nbsp; IgnitedQuery does not support the query caching methods, for the moment.
+	</p>
+	
+	<h2>Where can I get more information?</h2>
+	
+	<p>
+		More information about these filtering methods can you find in the
+		<a href="http://codeigniter.com/user_guide/database/active_record.html">CodeIgniter Active Record User Guide</a>.
+	</p>
+</div>
+
+
+<div id="footer">
+<p><a href="#top">Top of Page</a></p>
+<p><a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord</a>  &nbsp;&middot;&nbsp; Copyright &#169; 2008 &nbsp;&middot;&nbsp; Martin Wernstahl</p>
+<p><a href="http://codeigniter.com">CodeIgniter</a> &nbsp;&middot;&nbsp; Copyright &#169; 2006-2008 &nbsp;&middot;&nbsp; <a href="http://ellislab.com/">Ellislab, Inc.</a></p>
+</div>
+
+
+</body>
+</html>

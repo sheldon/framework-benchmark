@@ -1,0 +1,158 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv='expires' content='-1' />
+	<meta http-equiv= 'pragma' content='no-cache' />
+	
+	<title>Manipulating Data - IgnitedRecord User Guide Version 0.2.0</title>
+	
+	<link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+	<link rel="Shortcut Icon" href="../images/favicon.ico">
+	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+	
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../nav.js"></script>
+	<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+	$('#nav').hide();
+	$('#toggle_toc').click(function(){
+		$('#nav').slideToggle();
+	})
+});
+	</script>
+</head>
+<body>
+<div id="nav">
+	<script type="text/javascript">menu('../');</script>
+</div>
+<div id="nav2"><a name="top"></a><a id="toggle_toc"><img src="../images/nav_toggle.jpg" width="153" height="44" border="0" title="Toggle Table of Contents" alt="Toggle Table of Contents" /></a></div>
+<div id="masthead">
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td><h1>IgnitedRecord User Guide Version 0.2.0</h1></td>
+<td id="breadcrumb_right"><a href="../toc.html">Table of Contents Page</a></td>
+</tr>
+</table>
+</div>
+<!-- END NAVIGATION -->
+
+
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td id="breadcrumb">
+<a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord Home</a> &nbsp;&#8250;&nbsp; IgnitedRecord User Guide &nbsp;&#8250;&nbsp; Manipulating Data
+</td>
+<td id="searchbox"></td>
+</tr>
+</table>
+
+<div id="content">
+	<h1>Manipulating Data</h1>
+	
+	<p>
+		Data is stored in <kbd>IR_record</kbd> objects, whose properties store the data of the row.<br />
+		Here is an example of the data in an <kbd>IR_record</kbd>:
+	</p>
+	
+	<code>
+		IR_record Object (<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;[__table] =&gt; string(7) &quot;threads&quot;<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;[__id] =&gt; string(1) &quot;1&quot;<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;[id] =&gt; string(1) &quot;1&quot;<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;[name] =&gt; string(10) &quot;new thread&quot;<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;[data] =&gt; string(13) &quot;hello comment&quot;<br />
+		)
+	</code>
+
+	<p>
+		The __table and __id are properties that link that record to the right
+		row in the database.<br />
+		There is also a few other "hidden" properties (prefixed by __) that are not
+		displayed here, because they take too much space.
+	</p>
+	
+	<p>
+		Use the <a href="../misc/u_print_r.html">Customizable print_r()</a> to avoid
+		being buried in data when you dump your objects.
+	</p>
+	
+	<p>
+		Well, back to the point...<br />
+		The row data is stored as properties on <kbd>IR_record</kbd> objects.
+		To edit or read the data, you only have to access the values of their properties:
+	</p>
+	
+	<code>
+		$rec = $this-&gt;user-&gt;find_by('name', 'Martin');<br />
+		$rec-&gt;name = $rec-&gt;name . ' Wernstahl';<br />
+		echo $rec-&gt;name;  // echoes "Martin Wernstahl"
+	</code>
+	
+	<h2>uid()</h2>
+	
+	<p>
+		This method of the <kbd>IR_record</kbd> object provides the
+		<u>u</u>nique <u>id</u>entifier of the row wich the record is mapped to.<br />
+		It is usually an integer (and in the case above, it was 1).
+	</p>
+	
+	<p>
+		If it is not mapped to a record, <kbd>false</kbd> is returned.
+	</p>
+	
+	<h2>in_db()</h2>
+	
+	<p>
+		Also an <kbd>IR_record</kbd> method, this returns <kbd>true</kbd> if it is mapped to a database row,
+		<kbd>false</kbd> otherwise.
+	</p>
+	
+	<h2>load_data(<var>data</var>)</h2>
+	
+	<p>
+		This method populates the <kbd>IR_record</kbd> object with the data in the <var>data</var> array.
+	</p>
+	
+	<p>
+		Example:
+	</p>
+	
+	<code>
+		$rec = $this->user->get();  // I'll edit a user, I don't care who it is :P<br />
+		echo $rec->name; // well, it echoes something...<br />
+		$rec->load_data(array('name' => 'Foo Bar', 'email' => 'foo.bar@example.com'));<br />
+		echo $rec->name; // echoes 'Foo Bar'
+	</code>
+	
+	<h2>get_data()</h2>
+	
+	<p>
+		The opposite of <dfn>load_data()</dfn>, returns the row data in an array.
+	</p>
+	
+	<p>
+		Example:
+	</p>
+	
+	<code>
+		$rec = $this-&gt;user-&gt;get();<br />
+		$data = $rec-&gt;get_data();<br />
+		<br />
+		foreach($data as $column =&gt; $value)<br />
+		{<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;echo &quot;$column =&gt; $value\n&quot;;<br />
+		}
+	</code>
+</div>
+
+
+<div id="footer">
+<p><a href="#top">Top of Page</a></p>
+<p><a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord</a>  &nbsp;&middot;&nbsp; Copyright &#169; 2008 &nbsp;&middot;&nbsp; Martin Wernstahl</p>
+<p><a href="http://codeigniter.com">CodeIgniter</a> &nbsp;&middot;&nbsp; Copyright &#169; 2006-2008 &nbsp;&middot;&nbsp; <a href="http://ellislab.com/">Ellislab, Inc.</a></p>
+</div>
+
+
+</body>
+</html>

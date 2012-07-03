@@ -1,0 +1,161 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv='expires' content='-1' />
+	<meta http-equiv= 'pragma' content='no-cache' />
+	
+	<title>Thirdparty Behaviours - IgnitedRecord User Guide Version 0.2.0</title>
+	
+	<link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+	<link rel="Shortcut Icon" href="../images/favicon.ico">
+	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+	
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../nav.js"></script>
+	<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+	$('#nav').hide();
+	$('#toggle_toc').click(function(){
+		$('#nav').slideToggle();
+	})
+});
+	</script>
+</head>
+<body>
+<div id="nav">
+	<script type="text/javascript">menu('../');</script>
+</div>
+<div id="nav2"><a name="top"></a><a id="toggle_toc"><img src="../images/nav_toggle.jpg" width="153" height="44" border="0" title="Toggle Table of Contents" alt="Toggle Table of Contents" /></a></div>
+<div id="masthead">
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td><h1>IgnitedRecord User Guide Version 0.2.0</h1></td>
+<td id="breadcrumb_right"><a href="../toc.html">Table of Contents Page</a></td>
+</tr>
+</table>
+</div>
+<!-- END NAVIGATION -->
+
+
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td id="breadcrumb">
+<a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord Home</a> &nbsp;&#8250;&nbsp; IgnitedRecord User Guide &nbsp;&#8250;&nbsp; Thirdparty Behaviours
+</td>
+<td id="searchbox"></td>
+</tr>
+</table>
+
+<div id="content">
+	<h1>Thirdparty Behaviours</h1>
+	
+	<p>
+		Here below is a list of behaviors that are made and mantained by third parties.<br />
+		To install one of these, copy their file into <dfn>/application/models/ignitedrecord/behaviours/</dfn>.<br />
+	</p>
+	
+	<ul>
+		<li><a href="#timestamped">Timestamped</a></li>
+	</ul>
+	
+	<a name="timestamped">&nbsp;</a>
+	<h1>Timestamped behaviour</h1>
+	
+	<p>
+		<strong>Author:</strong> Jonas Flodén &lt;jonas@koalasoft.se&gt;<br />
+		
+		<strong>File:</strong> /thirdparty/timestamped.php<br />
+		
+		<strong>License:</strong> BSD License, see the file header for copyright information<br />	
+	</p>
+	
+	<p>
+		The timestamped behaviour provides automatic timestamps for the
+		time of creation and/or last update of the record.
+		It can be configured to use either UTC timestamps or localtime.
+	</p>
+	
+	<h2>Options</h2>
+	
+	<p>
+		These are the available options and their default values:
+	</p>
+	
+	<table cellpadding="0" cellspacing="1" border="0" class="tableborder">
+		<tr>
+			<th>Option</th>
+			<th>Description</th>
+			<th>Default value</th>
+		</tr>
+		<tr>
+			<td class="td"><strong>created_at</strong></td>
+			<td class="td">Specify the column for the creation timestamp, if set to false creation timestamps will not be used.</td>
+			<td class="td">created_at</td>
+		</tr>
+		<tr>
+			<td class="td"><strong>updated_at</strong></td>
+			<td class="td">Specify the column for the last update timestamp, if set to false last update timestamps will not be used.</td>
+			<td class="td">updated_at</td>
+		</tr>
+		<tr>
+			<td class="td"><strong>localtime</strong></td>
+			<td class="td">If set to true timestamps will be in local time, if false timestamps will be in UTC.</td>
+			<td class="td">false (timestamps in UTC)</td>
+		</tr>
+	</table>
+	
+	<h2>Usage</h2>
+	
+	<code>
+		// Use default table columns: created_at and updated_at<br />
+		var $act_as = 'timestamped';<br />
+		<br />
+		// To specify options:<br />
+		var $act_as = array('timestamped' => array('option' => 'value', ...));
+	</code>
+	
+	<p>
+		See <a href="index.html">Using Act_as</a> for more information on how to activate/install behaviours.
+	</p>
+	
+	<p>
+		The timestamps will be added to the <kbd>IR_record</kbd> objects with the defined column names.
+	</p>
+	
+	<p>
+		Example of usage with the default names:
+	</p>
+	
+	<code>
+		$obj = $this->my_model->find(...);<br/>
+		...<br/>
+		echo "Record was created at: {$obj->created at} and last updated at: {$obj->updated_at}";
+	</code>
+	
+	<p>
+		<strong>Note: </strong> Even though these values can be changed, the changes will not propagate to the database on save().
+		So the following code can be a little confusing:
+	</p>
+	
+	<code>
+		$obj = $this->my_model->new_record();<br />
+		$obj->prop = value;<br />
+		$obj->save();<br />
+		$obj->prop = new_value;</br>
+		$obj->created_at = '1980-01-01 00:00';<br />
+		$obj->save();<br />
+		echo $obj->created_at; // This will print 1980-01-01 00:00 even though the timestamp in the database is different
+	</code>
+</div>
+
+
+<div id="footer">
+<p><a href="#top">Top of Page</a></p>
+<p><a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord</a>  &nbsp;&middot;&nbsp; Copyright &#169; 2008 &nbsp;&middot;&nbsp; Martin Wernstahl</p>
+<p><a href="http://codeigniter.com">CodeIgniter</a> &nbsp;&middot;&nbsp; Copyright &#169; 2006-2008 &nbsp;&middot;&nbsp; <a href="http://ellislab.com/">Ellislab, Inc.</a></p>
+</div>
+
+
+</body>
+</html>

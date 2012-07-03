@@ -1,0 +1,212 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv='expires' content='-1' />
+	<meta http-equiv= 'pragma' content='no-cache' />
+	
+	<title>PHP 4 Specific Installation Instructions - IgnitedRecord User Guide Version 0.2.0</title>
+	
+	<link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+	<link rel="Shortcut Icon" href="../images/favicon.ico">
+	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+	
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../nav.js"></script>
+	<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+	$('#nav').hide();
+	$('#toggle_toc').click(function(){
+		$('#nav').slideToggle();
+	})
+});
+	</script>
+</head>
+<body>
+<div id="nav">
+	<script type="text/javascript">menu('../');</script>
+</div>
+<div id="nav2"><a name="top"></a><a id="toggle_toc"><img src="../images/nav_toggle.jpg" width="153" height="44" border="0" title="Toggle Table of Contents" alt="Toggle Table of Contents" /></a></div>
+<div id="masthead">
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td><h1>IgnitedRecord User Guide Version 0.2.0</h1></td>
+<td id="breadcrumb_right"><a href="../toc.html">Table of Contents Page</a></td>
+</tr>
+</table>
+</div>
+<!-- END NAVIGATION -->
+
+
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td id="breadcrumb">
+<a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord Home</a> &nbsp;&#8250;&nbsp; IgnitedRecord User Guide &nbsp;&#8250;&nbsp; PHP 4 Specific Installation Instructions
+</td>
+<td id="searchbox"></td>
+</tr>
+</table>
+
+<div id="content">
+	<h1>PHP 4 Specific Installation Instructions</h1>
+	
+	<p>
+		Below I will list all differences between PHP 4 and PHP 5 that affects IgnitedRecord:
+	</p>
+	
+	<h2>Copy by reference</h2>
+	
+	<p>
+		PHP 4 does not copy objects by reference as PHP 5 does. Example:
+	</p>
+	
+	<code>
+		$a = new foo();<br />
+		$a-&gt;bar = '$a talking';<br />
+		<br />
+		$b = $a; // in PHP 4 $b becomes a "real" copy of $a<br />
+		<br />
+		$b-&gt;bar = '$b talking';<br />
+		echo $a-&gt;bar; // echos '$b talking' in PHP 5, echos '$a talking' in PHP 4<br />
+		echo $b-&gt;bar; // echos '$b talking'<br />
+	</code>
+	
+	<p>
+		In <kbd>IgnitedRecord</kbd> there are a few "$foo = new bar($some_obj)",
+		and if they are not copied by reference, unwanted copies will be created.
+		Those unwanted copies could break IgnitedRecord,
+		beacause IgnitedRecord depends on the fact that an object is copied / passed by reference.
+	</p>
+	
+	<p>
+		So the thing you need to do is to modify all lines marked by "// PHP 4:".
+	</p>
+	
+	<p>
+		Example line:
+	</p>
+	
+	<code>
+		$model = new IgnitedRecord($settings); // PHP 4: $model =&amp; new IgnitedRecord($settings);
+	</code>
+	
+	<p>
+		It should be modified like this:<br />
+		<ol>
+			<li>Remove all code before the comment (on the same line).</li>
+			<li>Remove "// PHP 4: "</li>
+			<li>Done.</li>
+		</ol>
+	</p>
+	
+	<p>
+		The example above becomes:
+	</p>
+	
+	<code>
+		$model =&amp; new IgnitedRecord($settings);
+	</code>
+	
+	<p>
+		Here is a Regular expression replace that will do the job (skip the leading/trailing space):
+	</p>
+	
+	<code>
+		expression: ^([ \t]*)[^\n]*// PHP 4: ([^\n]*)$<br />
+		<br />
+		replace: $1$2
+	</code>
+	
+	<h2>The custom loader</h2>
+	
+	<p>
+		In PHP 4, the CI_Base class extends the CI_Loader.
+		It is hardcoded, so there is no way of changing the code without making modifications to the CI code.
+	</p>
+	
+	<p>
+		There are four solutions:
+	</p>
+	
+	<ul>
+		<li>
+			Copy the <dfn>orm()</dfn> method from <kbd>MY_Loader.php</kbd> to <kbd>system/libraries/Loader.php</kbd>.
+		</li>
+		<li>Create your own Loader in <dfn>application/libraries</dfn> where you also put the <dfn>orm()</dfn> method.</li>
+		<li>Modify <kbd>system/codeigniter/base4.php</kbd>, see this <a href="http://codeigniter.com/forums/viewthread/83614/">thread</a> to find out how.</li>
+		<li>Don't use the custom loader.</li>
+	</ul>
+	
+	<h2>Aggregation of objects</h2>
+	
+	<p>
+		This is not possible in PHP 4, so therefore the two <dfn>__call()</dfn>
+		won't provide any use.
+	</p>
+	
+	<p>
+		This makes the usage of behaviours a bit different than under PHP 5:
+	</p>
+	
+	<code>
+		$rec = $this->page->find(1);<br />
+		<br />
+		$children = $rec->get_children(); // use the IgnitedRecord tree behaviour, with help from __call()<br />
+		$children = $rec->tree->get_children(); // same result, this time without __call()<br />
+		<br />
+		$node = $this->page->xpath('/about/me'); // use the IgnitedRecord tree behaviour's xpath() method, with help from __call()<br />
+		$node = $this->page->tree->xpath('/about/MPTtree'); // same as above, without __call()
+	</code>
+	
+	<h2>Method Chaining</h2>
+	
+	<p>
+		Method chaining is a way to shorten the code when working with objects,
+		and it works only under PHP 5.<br />
+		This leads to code which is easier to read (well, that depend on the person that made the chaining :-P ).
+	</p>
+	
+	<p>
+		Example:
+	</p>
+	
+	<code>
+		$rec = $this-&gt;user-&gt;find(1);<br />
+		<br />
+		// chaining:<br />
+		$groups = $rec-&gt;related('groups')-&gt;order_by('name', 'desc')-&gt;get();<br />
+		<br />
+		foreach($groups as $g)<br />
+		{<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;echo $g-&gt;name;<br />
+		}<br />
+	</code>
+	
+	<p>
+		In PHP 4, you have to "break" the chains:
+	</p>
+	
+	<code>
+		$rec = $this-&gt;user-&gt;find(1);<br />
+		<br />
+		$groups_query =&amp; $rec-&gt;related('groups');<br />
+		$qroups_query-&gt;order_by('name', 'desc'); // this does only return $groups_query and therefore we do not need to assign it again<br />
+		$groups =&amp; $groups_query-&gt;get();<br />
+		<br />
+		foreach($groups as $g)<br />
+		{<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;echo $g-&gt;name;<br />
+		}<br />
+	</code>
+</div>
+
+
+<div id="footer">
+<p><a href="#top">Top of Page</a></p>
+<p><a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord</a>  &nbsp;&middot;&nbsp; Copyright &#169; 2008 &nbsp;&middot;&nbsp; Martin Wernstahl</p>
+<p><a href="http://codeigniter.com">CodeIgniter</a> &nbsp;&middot;&nbsp; Copyright &#169; 2006-2008 &nbsp;&middot;&nbsp; <a href="http://ellislab.com/">Ellislab, Inc.</a></p>
+</div>
+
+
+</body>
+</html>

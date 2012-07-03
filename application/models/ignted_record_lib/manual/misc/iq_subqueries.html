@@ -1,0 +1,234 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv='expires' content='-1' />
+	<meta http-equiv= 'pragma' content='no-cache' />
+	
+	<title>IgnitedQuery Subqueries - IgnitedRecord User Guide Version 0.2.0</title>
+	
+	<link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+	<link rel="Shortcut Icon" href="../images/favicon.ico">
+	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+	
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../nav.js"></script>
+	<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+	$('#nav').hide();
+	$('#toggle_toc').click(function(){
+		$('#nav').slideToggle();
+	})
+});
+	</script>
+</head>
+<body>
+<div id="nav">
+	<script type="text/javascript">menu('../');</script>
+</div>
+<div id="nav2"><a name="top"></a><a id="toggle_toc"><img src="../images/nav_toggle.jpg" width="153" height="44" border="0" title="Toggle Table of Contents" alt="Toggle Table of Contents" /></a></div>
+<div id="masthead">
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td><h1>IgnitedRecord User Guide Version 0.2.0</h1></td>
+<td id="breadcrumb_right"><a href="../toc.html">Table of Contents Page</a></td>
+</tr>
+</table>
+</div>
+<!-- END NAVIGATION -->
+
+
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td id="breadcrumb">
+<a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord Home</a> &nbsp;&#8250;&nbsp; IgnitedRecord User Guide &nbsp;&#8250;&nbsp; IgnitedQuery Subqueries
+</td>
+<td id="searchbox"></td>
+</tr>
+</table>
+
+<div id="content">
+	<h1>IgnitedQuery Subqueries</h1>
+	
+	<p>
+		IgnitedQuery is a SQL-string builder which is aimed to be compatible with
+		CodeIgniter's ActiveRecord class.<br />
+		It's goal is also to enable nested WHERE statements and subqueries.
+	</p>
+	
+	<p class="important">
+		<strong>Important:</strong>&nbsp; Everything described on this page
+		will only work with <strong>IgnitedQuery</strong> and not CI's
+		ActiveRecord implementation.<br />
+		See <a href="../inst/config.html">Configure IgnitedRecord</a> on how
+		to enable IgnitedQuery.
+	</p>
+	
+	<h2>Subqueries</h2>
+	
+	<p>
+		Subqueries are queries that are embedded into another query, providing a
+		second (or third, forth and so on) layer of selection, manipulation, sorting, etc.
+	</p>
+	
+	<p>
+		An example of a subquery:
+	</p>
+	
+	<code>
+		SELECT node.*<br />
+		FROM tree_table AS node,<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;(SELECT `id`<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FROM tree_table<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WHERE title = &#x27;Index&#x27;<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LIMIT 1<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;) AS parent<br />
+		WHERE node.parent_id = parent.id
+	</code>
+	
+	<p>
+		This one first selects the <var>id</var> from the row with <var>title</var>
+		"Index" and stores it as <var>parent</var>.<br />
+		Then it fetches all rows where the <var>parent_id</var> equals the <var>parent</var>'s <var>id</var>
+	</p>
+	
+	<p>
+		It's purpose is to fetch the children of a node in Adjacency Lists.
+	</p>
+	
+	<h2>How to construct subqueries</h2>
+	
+	<p>
+		There are a two different ways of constructing subqueries with IgnitedQuery:
+		<ul>
+			<li>
+				Manipulate the object recieved from an empty call to <dfn>from()</dfn>,
+				<dfn>where_in()</dfn>, <dfn>or_where_in()</dfn>, <dfn>where_not_in()</dfn>, 
+				<dfn>or_where_not_in</dfn>
+			</li>
+			<li>
+				Create a new <kbd>IgnitedQuery</kbd> object which gets manipulated
+				and then passed to one of the functions mentioned above
+			</li>
+		</ul>
+	</p>
+	
+	<p>
+		Example of the first way (with the same result as above):
+	</p>
+	
+	<code>
+		// Here I&#x27;ll use PHP 5 chaining:<br />
+		$this-&gt;node-&gt;select(&#x27;node.*&#x27;)<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt;from('tree_table AS node')<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt;from() // begin subquery<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt;select(&#x27;id&#x27;)<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt;from(&#x27;tree_table&#x27;)<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt;where(&#x27;title&#x27;, &#x27;Index&#x27;)<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt;limit(1)<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt;alias(&#x27;parent&#x27;)<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt;end() // end the subquery<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt;where(&#x27;node.parent_id&#x27;,&#x27;parent.id&#x27;, false); // false comes to the rescue<br />
+		<br />
+		<br />
+		// without chaining:<br />
+		$this-&gt;node-&gt;select(&#x27;node.*&#x27;);<br />
+		$this-&gt;node-&gt;from('tree_table AS node')<br />
+		<br />
+		$sub =&amp; $this-&gt;node-&gt;from(); // sub is a reference, all edits to $sub are reflected in the internally stored object<br />
+		<br />
+		$sub-&gt;select(&#x27;id&#x27;)<br />
+		$sub-&gt;from(&#x27;tree_table&#x27;)<br />
+		$sub-&gt;where(&#x27;title&#x27;, &#x27;Index&#x27;)<br />
+		$sub-&gt;limit(1)<br />
+		$sub-&gt;alias(&#x27;parent&#x27;)<br />
+		<br />
+		$this-&gt;node-&gt;where(&#x27;node.parent_id&#x27;,&#x27;parent.id&#x27;, false);
+	</code>
+	
+	<p>
+		Example of the second way:
+	</p>
+	
+	<code>
+		$this-&gt;node-&gt;select(&#x27;node.*&#x27;);<br />
+		$this-&gt;node-&gt;from('tree_table AS node')<br />
+		<br />
+		$sub = new Query(); // just an alias for IgnitedQuery<br />
+		$sub-&gt;select(&#x27;id&#x27;);<br />
+		$sub-&gt;from(&#x27;tree_table&#x27;);<br />
+		$sub-&gt;where(&#x27;title&#x27;, &#x27;Index&#x27;);<br />
+		$sub-&gt;limit(1);<br />
+		$sub-&gt;alias(&#x27;parent&#x27;);<br />
+		<br />
+		$this-&gt;node-&gt;from($sub);<br />
+		$this-&gt;node-&gt;where(&#x27;node.parent_id&#x27;,&#x27;parent.id&#x27;, false);
+	</code>
+	
+	<h2>Nested WHERE Statements</h2>
+	
+	<p>
+		Nested WHERE statements are useful when there are different combinations
+		of conditions to match in a WHERE statement.<br />
+		Here is an example of a WHERE with nested statements:
+	</p>
+	
+	<code>
+		WHERE (title = 'About' OR author = 'Foo Bar') AND published = '1'
+	</code>
+	
+	<p>
+		They are created/used almost exactly as the Subqueries,
+		with the exception that you use <dfn>where()</dfn>, <dfn>where_not()</dfn>, <dfn>or_where()</dfn> and <dfn>or_where_not()</dfn>.
+	</p>
+	
+	<p>
+		The second difference is that only the WHERE part of the query is modifiable
+		(well, everything except the WHERE part on the object passed to <dfn>where()</dfn>
+		is ignored).
+	</p>
+	
+	<p>
+		Example:
+	</p>
+	
+	<code>
+		// chaining:<br />
+		$this-&gt;page-&gt;where() // begin nested where<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt;where(&#x27;title&#x27;, &#x27;About&#x27;)<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt;or_where(&#x27;author&#x27;, &#x27;Foo&#x27;)<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt;end() // end nested where<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt;where(&#x27;published&#x27;,1);<br />
+		<br />
+		<br />
+		// no chains:<br />
+		$sub =&amp; $this-&gt;page-&gt;where()<br />
+		<br />
+		$sub-&gt;where(&#x27;title&#x27;, &#x27;About&#x27;)<br />
+		$sub-&gt;or_where(&#x27;author&#x27;, &#x27;Foo&#x27;)<br />
+		<br />
+		$this-&gt;page-&gt;where(&#x27;published&#x27;,1);<br />
+		<br />
+		<br />
+		// new object<br />
+		$sub = new Query();<br />
+		<br />
+		$sub-&gt;where(&#x27;title&#x27;, &#x27;About&#x27;)<br />
+		$sub-&gt;or_where(&#x27;author&#x27;, &#x27;Foo&#x27;)<br />
+		<br />
+		$this-&gt;page-&gt;where($sub);<br />
+		<br />
+		$this-&gt;page-&gt;where(&#x27;published&#x27;,1);
+	</code>
+</div>
+
+
+<div id="footer">
+<p><a href="#top">Top of Page</a></p>
+<p><a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord</a>  &nbsp;&middot;&nbsp; Copyright &#169; 2008 &nbsp;&middot;&nbsp; Martin Wernstahl</p>
+<p><a href="http://codeigniter.com">CodeIgniter</a> &nbsp;&middot;&nbsp; Copyright &#169; 2006-2008 &nbsp;&middot;&nbsp; <a href="http://ellislab.com/">Ellislab, Inc.</a></p>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,1492 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+
+<title>CodeIgniter Project Documentation : IgnitedRecord</title>
+
+<style type='text/css' media='all'>@import url('./userguide.css');</style>
+<style type='text/css' media='all'>@import url('./images/userguide.css');</style>
+<link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv='expires' content='-1' />
+<meta http-equiv= 'pragma' content='no-cache' />
+<meta name='robots' content='all' />
+</head>
+<body>
+
+<!-- START NAVIGATION -->
+<div id="nav"><div id="nav_inner"></div></div>
+<div id="nav2"><a name="top">&nbsp;</a></div>
+<div id="masthead">
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td><h1>IgnitedRecord User Guide 0.1.1</h1></td>
+<td id="breadcrumb_right"><a href="../toc.html">Table of Contents Page</a></td>
+</tr>
+</table>
+</div>
+<!-- END NAVIGATION -->
+
+
+<!-- START BREADCRUMB -->
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td id="breadcrumb">
+<a href="http://codeigniter.com/">CodeIgniter Home</a> &nbsp;&#8250;&nbsp;
+<a href="../index.html">User Guide Home</a> &nbsp;&#8250;&nbsp;
+IgnitedRecord
+</td>
+<td id="searchbox"><form method="get" action="http://www.google.com/search">
+<input type="hidden" name="as_sitesearch" id="as_sitesearch" value="#" />Search Project User Guide&nbsp;
+<input type="text" class="input" style="width:200px;" name="q" id="q" size="31" maxlength="255" value="" />&nbsp;
+<input type="submit" class="submit" name="sa" value="Go" /></form></td>
+</tr>
+</table>
+<!-- END BREADCRUMB -->
+
+<br clear="all" />
+
+<!-- START CONTENT -->
+<div id="content">
+<div id="toc">
+	<div class="head">Table of Contents:</div>
+	<ul>
+		<li><a href="#top">About IgnitedRecord</a></li>
+		<li><a href="#load">Extend the IgnitedRecord Model</a></li>
+	</ul>
+	<ul>
+		<li><a href="#relations">Relations:</a></li>
+		<li>
+			<ul>
+				<li><a href="#belongs_to">The Belongs To relationship</a></li>
+				<li><a href="#has_many">The Has Many relationship</a></li>
+				<li><a href="#has_one">The Has One relationship</a></li>
+				<li><a href="#habtm">The Has And Belongs To Many relationship</a></li>
+			</ul>
+		</li>
+	</ul>
+	<ul>
+		<li><a href="#fetch">Methods for fetching data</a></li>
+		<li><a href="#record">The IgnitedRecord_record object</a></li>
+	</ul>
+	<ul>
+		<li><a href="#behaviours">Behaviours</a></li>
+		<li><a href="#hooks">Hooks</a></li>
+	</ul>
+	<ul>
+		<li><a href="#print_r">Customizable version of print_r()</a></li>
+		<li><a href="#license">License</a></li>
+		<li><a href="#change">Change Log</a></li>
+	</ul>
+</div>
+
+<h1><a name="top">IgnitedRecord Model</a></h1>
+
+<p>
+	This is an ActiveRecord-like (Ruby's ActiveRecord) ORM model which is aimed to be simple to use, yet very customizable.<br />
+	Every derived class is a factory which produces objects which in turn represents a row in the database table which the derived class is mapped to.
+</p>
+
+<h2>Installation</h2>
+
+<p>
+	Drop the folder <dfn>ignitedrecord</dfn> in your <dfn>application/models</dfn> directory.<br />
+	IgnitedRecord uses the CodeIgniter ActiveRecord implementation, so the <kbd>$active_record</kbd> option must be set to <kbd>true</kbd> in the <dfn>application/config/database.php</dfn>.
+</p>
+
+<p>
+	The <kbd>MY_Loader.php</kbd> file is optional, but provides a custom loader function which simplifies the loading of IgnitedRecord and its derived classes.<br />
+	This file should be put in the <dfn>application/libraries</dfn> folder.
+	If you already have a custom loader file (or use another loader class, eg. Matchbox), copy the <dfn>ORM()</dfn> method from the IgnitedRecord custom loader to yours.
+</p>
+
+<p>
+	If you have planned to use the <dfn>yamlfactory()</dfn> you also have to install
+	a yamlparser.<br />
+	<dfn>yamlfactory()</dfn> uses a yaml parser called 
+	<a href="http://codeigniter.com/wiki/YAYparser/">YAYparser</a>, it is bundled
+	with IgnitedRecord, but you can easily edit <dfn>yamlfactory()</dfn> to
+	utilize another parser.
+</p>
+
+<p>
+	To install YAYparser, copy <kbd>yayparser_helper.php</kbd> from the helpers
+	dir to your <dfn>application/helpers</dfn>
+</p>
+
+<h2>PHP 4</h2>
+
+<p>
+	If you are using PHP 4, the two <dfn>__call()</dfn> methods won't work.
+	The <dfn>__call()</dfn> methods only provides an aggregation of the helpers and behaviours, which is not necessary, but it makes for a bit shorter code.<br />
+	Example:
+</p>
+
+<code>
+$rec = $this->page->find(1);<br />
+<br />
+$children = $rec->get_children(); // use the IgnitedRecord tree behaviour, with help from __call()<br />
+$children = $rec->tree->get_children(); // same result, this time without __call()<br />
+<br />
+$node = $this->page->xpath('/about/me'); // use the IgnitedRecord tree behaviour's xpath() method, with help from __call()<br />
+$node = $this->page->tree->xpath('/about/MPTtree'); // same as above, without __call()
+</code>
+
+<p>
+	Another thing you might want to do is to replace all '= new' with '=&amp; new' (8 places in the IgnitedRecord class).
+</p>
+
+&nbsp;
+
+<h1><a name="load">Extend The IgnitedRecord Model</a></h1>
+
+<p>
+	This model is meant to be extended by child classes, and is not to be used directly.
+	Therefore you have to let other classes extend the <kbd>IgnitedRecord</kbd> class.
+</p>
+
+<p>
+	Because the models inherit each other, you have to load them in order.
+	The <kbd>Model</kbd> class must be loaded before the <kbd>IgnitedRecord</kbd> class which in turn must be loaded before the derived classes.<br />
+	The easiest way is to call <dfn>$this-&gt;load-&gt;model('ignitedrecord/ignitedrecord')</dfn> in the controller, before you load any of the derived classes.
+</p>
+
+<p>
+	There is also a custom <kbd>MY_Loader.php</kbd> which simplifies the loading of derived classes.<br />
+	It provides this method:
+</p>
+
+<h3>orm('<var>modelname</var>' = false, <var>name</var> = '', <var>db_conn</var> = FALSE)</h3>
+
+<p>
+	If <var>modelname</var> is not set (is false), <dfn>orm()</dfn> will not call <dfn>Loader::model()</dfn>.
+	It will only load the Model class and IgnitedRecord class, but will not instantiate them.
+</p>
+
+<p>
+	But if <var>modelname</var> is set, after it has loaded the Model class and IgnitedRecord, <dfn>orm()</dfn> will call <dfn>Loader::model()</dfn> and pass all recieved parameters to it (well, <var>modelname</var>, <var>name</var> and <var>db_conn</var>).<br />
+	So the <dfn>orm()</dfn> method can act like a wrapper for the <dfn>Loader::model()</dfn>.
+</p>
+
+<p>
+	Example:
+</p>
+
+<code>
+$this->load->orm();<br />
+$this->page = IgnitedRecord::factory('page');<br />
+// or:<br />
+$this->load->orm('page'); // calls $this->load->model('page')
+</code>
+
+<h2>Derived classes</h2>
+
+<p>
+	The most simple model you can have with IgnitedRecord is the following:
+</p>
+
+<code>
+class Page extends IgnitedRecord{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;function Page(){<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parent::IgnitedRecord();<br />
+&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+}<br />
+</code>
+
+<p>
+	This model maps itself to the Pages table in the database and contains all basic methods for fetching data from the database.<br />
+	See <a href="#fetch">Methods for fetching data</a> for more information on how to fetch data using the inherited methods.
+</p>
+
+<p>
+	In the child classes you can specify a lot of different options, if an option is not specified a default value is assumed:
+</p>
+
+<table cellpadding="0" cellspacing="1" border="0" class="tableborder">
+<tr>
+	<th>Property</th>
+	<th>Default</th>
+	<th>Description</th>
+</tr>
+<tr>
+	<td class="td">$__table</td>
+	<td class="td">Pluralized version of class name<br />( minus '_model', if exists)</td>
+	<td class="td">The table this model is mapped to</td>
+</tr>
+<tr>
+	<td class="td">$__id_col</td>
+	<td class="td">id</td>
+	<td class="td">The column that stores the unique id, preferred to be auto incremental unsigned int</td>
+</tr>
+<tr>
+	<td class="td">$__columns</td>
+	<td class="td">autoloaded when needed</td>
+	<td class="td">Contains all column names, define yourself to save one query (SHOW COLUMNS FROM...)</td>
+</tr>
+<tr>
+	<td class="td">$__child_class</td>
+	<td class="td">IgnitedRecord_record</td>
+	<td class="td">The name of the class which this factory produces</td>
+</tr>
+<tr>
+	<td class="td">$__auto_load_relationships</td>
+	<td class="td">false</td>
+	<td class="td">If to autoload the relations when an object is created (Warning, can cause endless loops because of a related table having $__auto_load_relationships switched on and relates back to this table)</td>
+</tr>
+<tr>
+	<td class="td">$__act_as</td>
+	<td class="td">array()</td>
+	<td class="td">The behaviours this model shall utilize, read more about <a href="#behaviours">Behaviours</a></td>
+</tr>
+<tr>
+	<td class="td">$__belongs_to</td>
+	<td class="td">null</td>
+	<td class="td">Specifies the attributes of one or more <a href="#belongs_to">Belongs To relationships</a> that this model has</td>
+</tr>
+<tr>
+	<td class="td">$__has_many</td>
+	<td class="td">null</td>
+	<td class="td">Specifies the attributes of one or more <a href="#has_many">Has Many relationships</a> that this model has</td>
+</tr>
+<tr>
+	<td class="td">$__has_one</td>
+	<td class="td">null</td>
+	<td class="td">Specifies the attributes of one or more <a href="#has_one">Has One relationships</a> that this model has</td>
+</tr>
+<tr>
+	<td class="td">$__has_and_belongs_to_many</td>
+	<td class="td">null</td>
+	<td class="td">Specifies the attributes of one or more <a href="#habtm">Has And Belongs To Many relationships</a> that this model has</td>
+</tr>
+<tr>
+	<td class="td">$__habtm</td>
+	<td class="td">null</td>
+	<td class="td">An alias for $__has_and_belongs_to_many. These two arrays will be merged to one in the constructor.</td>
+</tr>
+</table>
+
+<p>
+	There are also a second way of creating a derived class: The <dfn>factory()</dfn> and <dfn>yamlfactory()</dfn> methods:
+</p>
+
+<h2>factory('<var>table name</var>', <var>settings</var> = array())</h2>
+
+<p>
+	This method creates and instantiates a derived class linked to the table <var>table name</var> and with the properties stored in the <var>settings</var> array (property => value).<br />
+	The instantiated object is returned.
+</p>
+
+<p>
+	<strong>Note</strong>: All propertynames is prepended with a double underscore.
+</p>
+
+<h2>yamlfactory('<var>filename</var>')</h2>
+
+<p>
+	A factory that utilizes yaml instead of a PHP array.
+</p>
+
+<p>
+	If the <var>filename</var> is a yaml string (contains <kbd>\n</kbd>) it is parsed
+	with yayparser into a PHP array. This array is then passed to a new IgnitedRecord
+	object.<br />
+	If the <var>filename</var> is a filename (does not contain <kbd>\n</kbd>),
+	IgnitedRecord attempts to load the file, then parses it into a PHP array.
+</p>
+
+<p>
+	<strong>Note</strong>: All propertynames is prepended with a double underscore.
+</p>
+
+&nbsp;
+
+<h1><a name="relations">Establish Relations</a></h1>
+
+<p>
+	To define a relationship between two tables, you can use two approaches:<br />
+	You have to set one of these properties:
+</p>
+	<ul>
+		<li>$__belongs_to</li>
+		<li>$__has_many</li>
+		<li>$__has_one</li>
+		<li>$__has_and_belongs_to_many</li>
+	</ul>
+<p>
+	Or you can use one of these methods (they accept the same data as the properties, but can only add/replace relations):
+</p>
+	<ul>
+		<li><dfn>set_belongs_to()</dfn></li>
+		<li><dfn>set_has_many()</dfn></li>
+		<li><dfn>set_has_one()</dfn></li>
+		<li><dfn>set_habtm()</dfn> (Has And Belongs To Many)</li>
+	</ul>
+<p>
+	The simplest value these properties can contain is the table name of the related table.<br />
+	But there are more settings that can be altered and specified through these properties.
+	The settings and their default values vary, so check the part of the manual that is covering the specific relation type.
+</p>
+
+<p>
+	The properties can be specified in four ways:
+</p>
+
+<code>
+// single:<br />
+= 'tablename';<br />
+// multiple:<br />
+= array('tablename','tablename');<br />
+// the advanced variant (enables to override defaults):<br />
+= array('name'&nbsp;&nbsp;=> 'relationname',<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'table' => 'tablename', // all others except this one can be omitted<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'col'&nbsp;&nbsp; => 'foreign_key_col',<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'model' => 'modelname'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; );<br />
+// multiple w. advanced variant:<br />
+= array(array('name'&nbsp;&nbsp;=> 'relationname',<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'table' => 'tablename',<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'col'&nbsp;&nbsp; => 'foreign_key_col',<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'model' => 'modelname'<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ),<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array('table' => 'anothertable'),<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'atable' // simple, preferred to the one above (shorter :P)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; );
+</code>
+<p>
+	Example:
+</p>
+
+<code>
+var $__belongs_to = array('users','forums'); // relate to two tables<br />
+var $__has_many = array('table' => 'posts', 'col' => 'post_id'); // override the default foreign key column name (posts_id)<br />
+var $__has_and_belongs_to_many = array(array('table' => 'tags', 'rel_table' => 'tagged'),<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'moderators'); // multiple relations + overrride<br />
+<br />
+// in controller example:<br />
+$this->teacher->set_has_many('students');
+</code>
+
+<p>
+	There are four types of relations which IgnitedRecord supports:
+</p>
+
+<h2><a name="belongs_to">Belongs To</a></h2>
+
+<p>
+	The Belongs To relationship is often used at the receiving end of a Has Many or a Has One relationship.<br />
+	Example:
+</p>
+
+<table cellpadding="0" cellspacing="0">
+	<tr>
+		<td>
+			<code>
+class user extends IgnitedRecord{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;var $__has_one = ‘pictures’;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;function user(){<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parent::IgnitedRecord();<br />
+&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+}
+</code>
+<code>
+class picture extends IgnitedRecord{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;var $__belongs_to = 'users';<br />
+&nbsp;&nbsp;&nbsp;&nbsp;function picture(){<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parent::IgnitedRecord();<br />
+&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+}
+			</code>
+		</td>
+		<td>
+			<img src="images/has_one_belongs_to.png" />
+		</td>
+	</tr>
+</table>
+
+<p>
+	Here we have specified a relation between the users table and the pictures table.<br />
+	The pictures Belongs To users, and therefore pictures table has a foreign key column (the key referring to the other table) referring to users (called users_id).<br />
+	The difference between a Belongs To and a Has One is that Belongs To has the foreign key in the table which Belongs To, while the Has One stores the key in the related table.
+</p>
+
+<p>
+	To specify special settings in a relationship, define an array containing the settings you want to override (would replace the normal position of the table name).<br />
+	The default settings for the Belongs To relation is the following:
+</p>
+
+<table cellpadding="0" cellspacing="1" border="0" class="tableborder">
+<tr>
+	<th>Key</th>
+	<th>Default</th>
+	<th>Description</th>
+</tr>
+<tr>
+	<td class="td">table</td>
+	<td class="td">REQUIRED</td>
+	<td class="td">The related table</td>
+</tr>
+<tr>
+	<td class="td">name</td>
+	<td class="td">modelname (of the related table) or singular(tablename)</td>
+	<td class="td">The relation name, used when adding, removing and loading related records</td>
+</tr>
+<tr>
+	<td class="td">model</td>
+	<td class="td">tablename or singular(tablename), depending on if a model with that name exists</td>
+	<td class="td">The model to be used when instantiating related records (if no model is found, it uses this class to instantiate the records)</td>
+</tr>
+<tr>
+	<td class="td">col</td>
+	<td class="td">tablename of the related table + _id</td>
+	<td class="td">The foreign key column used by the relation</td>
+</tr>
+</table>
+
+<h2><a name="has_many">Has Many</a></h2>
+
+<p>
+	This relation type describes a one to many relationship.<br />
+	Example:<br />
+&nbsp;&nbsp;&nbsp;&nbsp;A user can have many posts:<br />
+</p>
+
+<img src="images/has_many_example.png" />
+
+<p>
+	Here Foo Bar has two posts, and Another Person has one post.
+	The posts still belong to only one user, however.
+</p>
+
+<p>
+	Code for establishing this relation:
+</p>
+
+
+<code>
+class user extends IgnitedRecord{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;var $__has_many = 'posts';<br />
+&nbsp;&nbsp;&nbsp;&nbsp;function user(){<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parent::IgnitedRecord();<br />
+&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+}
+</code>
+
+<code>
+class post extends IgnitedRecord{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;var $__belongs_to = 'users';<br />
+&nbsp;&nbsp;&nbsp;&nbsp;function post(){<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parent::IgnitedRecord();<br />
+&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+}<br />
+</code>
+
+<p>
+	Settings for a Has Many relationship:
+</p>
+
+<table cellpadding="0" cellspacing="1" border="0" class="tableborder">
+<tr>
+	<th>Key</th>
+	<th>Default</th>
+	<th>Description</th>
+</tr>
+<tr>
+	<td class="td">table</td>
+	<td class="td">REQUIRED</td>
+	<td class="td">The related table</td>
+</tr>
+<tr>
+	<td class="td">name</td>
+	<td class="td">the tablename of the related table</td>
+	<td class="td">The relation name, used when adding, removing and loading related records</td>
+</tr>
+<tr>
+	<td class="td">model</td>
+	<td class="td">tablename or singular(relatedtablename), depending on if a model with that name exists</td>
+	<td class="td">The model to be used when instantiating related records (if no model is found, it uses this class to instantiate the records)</td>
+</tr>
+<tr>
+	<td class="td">col</td>
+	<td class="td">tablename of this table + _id</td>
+	<td class="td">The foreign key column used by the relation</td>
+</tr>
+</table>
+
+<h2><a name="has_one">Has One</a></h2>
+
+<p>
+	This is like an inverted Belongs To relation, both relates one to one.
+	But by specifying a Has relationship, we declare that the foreign key (the key referring to the other table) should reside in the other table.
+	In the case in the Belongs To paragraph, pictures.
+</p>
+
+<p>
+	Or you can look at it as a Has Many relation, but with the limitation that only one related record is allowed.
+</p>
+
+<p>
+	Settings for a Has One relationship:
+</p>
+
+<table cellpadding="0" cellspacing="1" border="0" class="tableborder">
+<tr>
+	<th>Key</th>
+	<th>Default</th>
+	<th>Description</th>
+</tr>
+<tr>
+	<td class="td">table</td>
+	<td class="td">REQUIRED</td>
+	<td class="td">The related table</td>
+</tr>
+<tr>
+	<td class="td">name</td>
+	<td class="td">modelname (of the related table) or singular(relatedtablename)</td>
+	<td class="td">The relation name, used when adding, removing and loading related records</td>
+</tr>
+<tr>
+	<td class="td">model</td>
+	<td class="td">tablename or singular(tablename), depending on if a model with that name exists</td>
+	<td class="td">The model to be used when instantiating related records (if no model is found, it uses this class to instantiate the records)</td>
+</tr>
+<tr>
+	<td class="td">col</td>
+	<td class="td">tablename of this table + _id</td>
+	<td class="td">The foreign key column used by the relation</td>
+</tr>
+</table>
+
+<h2><a name="habtm">Has And Belongs To Many</a></h2>
+
+<p>
+	This is the relation you choose when you need to have many to many relations.
+	For example a developer can have (or belong to) many clients, but a client can have (or belong to) many developers.
+</p>
+
+<p>
+	Example table diagram:
+</p>
+
+
+<img src="images/habtm.png" />
+
+<code>
+class person extends IgnitedRecord{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;var $__table = 'people'; // override the default value: persons<br />
+&nbsp;&nbsp;&nbsp;&nbsp;var $__has_and_belongs_to_many = 'pictures';<br />
+&nbsp;&nbsp;&nbsp;&nbsp;function person(){<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parent::IgnitedRecord();<br />
+&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+}
+</code>
+
+<code>
+class picture extends IgnitedRecord{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;var $__has_and_belongs_to_many = array('table' => 'people', 'model' => 'person'); // set a model<br />
+&nbsp;&nbsp;&nbsp;&nbsp;function picture(){<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parent::IgnitedRecord();<br />
+&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+}<br />
+</code>
+
+<p>
+	Example of data inserted and with relations in both ways:
+</p>
+
+<img src="images/habtm_example.png" />
+
+<p>
+	Here the Another Person relates to both img1 and img3, while img2 relates to both Foo Bar and Some Dude.<br />
+	Example returns when calling <dfn>get_related()</dfn>:
+</p>
+
+<code>
+$rec = $this-&gt;person-&gt;find(1); // find Another Person<br />
+$pictures = $rec-&gt;get_related('pictures');<br />
+echo "Pictures containing {$rec->firstname}";<br />
+foreach($pictures as $pic){<br />
+&nbsp;&nbsp;&nbsp;&nbsp;echo '&lt;img src="'.$pic->path.'/&gt;'; // insert image<br />
+&nbsp;&nbsp;&nbsp;&nbsp;// echo those other people on the picture<br />
+&nbsp;&nbsp;&nbsp;&nbsp;foreach($pic->get_related('people') as $person){<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;echo $person->firstname;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+}
+</code>
+
+<p>
+	Settings, their default values and their keynames:
+</p>
+
+<table cellpadding="0" cellspacing="1" border="0" class="tableborder">
+<tr>
+	<th>Key</th>
+	<th>Default</th>
+	<th>Description</th>
+</tr>
+<tr>
+	<td class="td">table</td>
+	<td class="td">REQUIRED</td>
+	<td class="td">The related table</td>
+</tr>
+<tr>
+	<td class="td">name</td>
+	<td class="td">the related tablename</td>
+	<td class="td">The relation name, used when adding, removing and loading related records</td>
+</tr>
+<tr>
+	<td class="td">model</td>
+	<td class="td">tablename or singular(relatedtablename), depending on if a model with that name exists</td>
+	<td class="td">The model to be used when instantiating related records (if no model is found, it uses this class to instantiate the records)</td>
+</tr>
+<tr>
+	<td class="td">rel_table</td>
+	<td class="td">'thistablename_relatedtablename' or 'relatedtablename_thistablename', depending on which one comes first alphabetically</td>
+	<td class="td">The table used for storing the relations</td>
+</tr>
+<tr>
+	<td class="td">this_col</td>
+	<td class="td">tablename + _id</td>
+	<td class="td">The foreign key column used relating to this table</td>
+</tr>
+<tr>
+	<td class="td">other_col</td>
+	<td class="td">tablename of the related table + _id</td>
+	<td class="td">The foreign key column used relating to the related table</td>
+</tr>
+</table>
+
+&nbsp;
+
+<h1><a name="fetch">Methods for fetching data</a></h1>
+
+<p>
+	All these methods return IgnitedRecord_records, see <a href="#record">The IgnitedRecord_record object</a> for information on how to obtain and manipulate data from them.<br />
+	If the $__child_class property is changed, the objects created will be of that type.
+</p>
+
+<h2>find(<var>id</var>)</h2>
+
+<p>
+	The <dfn>find()</dfn> method returns the record with the supplied id <var>id</var>.<br />
+	Returns <kbd>false</kbd> if nothing was found.
+</p>
+
+<h2>get()</h2>
+
+<p>
+	This method fetches one record from the table.
+	It is meant to be used in conjunction with CodeIgniter's ActiveRecord class, where the ActiveRecord class filters and sorts the query (you can see it as a replacement for the Active Record's <dfn>get()</dfn> method).
+</p>
+
+<p>
+	The only call to the db this method does is the following (to fetch the row from the mapped table):<br />
+	<tt>$data = $this-&gt;db-&gt;get($this-&gt;__table,1);</tt>, see the <a href="http://codeigniter.com/user_guide/database/active_record.html">CodeIgniter ActiveRecord manual</a> for details.
+</p>
+
+<code>
+$this-&gt;db-&gt;where_in('title', array('about', 'latest', 'notes'));<br />
+$record = $this-&gt;page-&gt;get();
+</code>
+
+<h2>find_by(<var>column(s)</var>, <var>data</var>)</h2>
+
+<p>
+	Returns the first record where the data in the column(s) <var>column(s)</var> matches <var>data</var>.<br />
+	The <var>column(s)</var> parameter can be array or scalar, the same for <var>data</var>.
+	These two arrays are then merged into an array, where the elements in the <var>column(s)</var> array is the keys and the elements in the <var>data</var> array are values. This array are then sent to CodeIgniter's ActiveRecord library, so the <var>column(s)</var> can contain !=, &gt;, &lt;, etc.
+</p>
+
+<p>
+	Example:
+</p>
+
+<code>
+$record = $this->page->find_by('title','index'); // searches for a record with the title 'index'<br />
+$record = $this->page->find_by(array('id >','title'),array(3,'blog')); // searches for a record where the id is greater than 3 and the title equals 'blog'
+</code>
+
+<h2>find_by_sql('<var>sql_query_string</var>')</h2>
+
+<p>
+	Returns a record (the first one, so limit the query to return one row to lower bandwith usage) created from the data returned from the query <var>sql_query_string</var>.
+	The query should be escaped and should start with 'SELECT * ' or equivalent.
+</p>
+
+<p>
+	Example:
+</p>
+
+<code>
+$record = $this->page->find_by_sql('SELECT *, count(*) AS Authors FROM pages WHERE Authors &gt; 2 LIMIT 1'); <br />
+// this will also create a column named Authors, which will be ignored when you save the $record
+</code>
+
+<h2>find_all()</h2>
+
+<p>
+	Returns all records in the table.
+</p>
+
+<p>
+	Or, it could be used as a substitute for CodeIgniter's ActiveRecord db::get() method.
+	The only call to the db this method does is the following (to fetch all rows from the mapped table):<br />
+	<tt>$data = $this-&gt;db-&gt;get($this-&gt;__table);</tt>, see the <a href="http://codeigniter.com/user_guide/database/active_record.html">CodeIgniter ActiveRecord manual</a> for details.
+</p>
+
+<p>
+	The difference is that <dfn>find_all()</dfn> returns all rows, <dfn>get()</dfn> returns only one.
+</p>
+
+<h2>find_all_by(<var>column(s)</var>, <var>data</var>)</h2>
+
+<p>
+	As <dfn>find_by()</dfn>, but returns all matching records.
+</p>
+
+<h2>find_all_by_sql('<var>sql_query_string</var>')</h2>
+
+<p>
+	As <dfn>find_by_sql()</dfn>, but returns all matching records.
+</p>
+
+<h2>new_record(<var>data</var> = array())</h2>
+	
+<p>
+	Returns a new IgnitedRecord_record which isn't linked to a db row. Populates it with the associative array <var>data</var>.<br />
+	To enter the record in the database after the creation, use the <dfn>save()</dfn> method.
+</p>
+
+<code>
+$new = $this-&gt;page-&gt;new_record(array('title' => 'downloads')); // creates a new record with the column title set to 'downloads'
+</code>
+
+&nbsp;
+
+<h1><a name="record">The IgnitedRecord_record object</a></h1>
+
+<p>
+	This is the object that stores the individual row data.
+	It is linked to the IgnitedRecord model (or rather the derived class) which it uses for saving, updating, relations, etc.
+</p>
+
+<p>
+	The properties of the IgnitedRecord_record are the column values of the record.<br />
+	Example:
+</p>
+
+<code>
+$records = $this-&gt;page-&gt;find_all();<br />
+foreach($records as $record){<br />
+&nbsp;&nbsp;&nbsp;&nbsp;echo "{$record-&gt;title}\n";<br />
+}
+</code>
+
+<p>
+	The methods available in the IgnitedRecord_record class are these:
+</p>
+
+<h2>save(<var>force</var> = false)</h2>
+
+<p>
+	This method saves the record to the database.
+	If the record does not exist in the database (the id is set to null (default)), an insert is performed.<br />
+	Empty objects cannot be inserted (because CodeIgniter does not allow inserts without data).
+</p>
+
+<p>
+	If <var>force</var> is true, the object will be saved even if it was unchanged.
+</p> 
+
+<code>
+$rec = $this-&gt;page-&gt;new_record();<br />
+$rec-&gt;title = 'test';<br />
+$rec-&gt;save(); // performs an insert of a row with the title value set to 'test'<br />
+<br />
+$rec = $this-&gt;page-&gt;find_by('title','About');<br />
+$rec-&gt;title = 'Me';<br />
+$rec-&gt;save(); // performs an update of the row fetched by find_by()
+</code>
+
+<p>
+	If the INSERT/UPDATE is successful, true is returned, otherwise is false returned.<br />
+	If the data in the record has not been altered, <dfn>save()</dfn> will not save the data again (and false is returned).
+</p>
+
+<h2>update()</h2>
+
+<p>
+	Updates the data in the current object.
+	If the row has been deleted from the database, the object still contains the data (but the id is removed, so it isn't linked to a record).
+</p>
+
+<h2>in_db()</h2>
+
+<p>
+	Returns true if this object is linked to a row in the database.
+</p>
+
+<code>
+$rec = $this->page->find(3);<br />
+var_dump($rec->in_db()); // TRUE<br />
+<br />
+$rec = $this->page->new_record();<br />
+var_dump($rec->in_db()); // FALSE
+</code>
+
+<h2>uid()</h2>
+
+<p>
+	Returns the unique id of the current record (the value of the id column(s)).<br />
+	If this record does not exist in the database, false is returned.
+</p>
+
+<code>
+foreach($pages as $page){<br />
+&nbsp;&nbsp;&nbsp;&nbsp;echo "&lt;li&gt;&lt;a href='".site_url('thiscontroller','view',$page->uid())."'&gt;".$page-&gt;title"&lt;/a&gt;&lt;/li&gt;";<br />
+}
+</code>
+
+<h2>delete()</h2>
+
+<p>
+	Deletes the record from the database.
+	All data (except relations and id) in the record are preserved, so you can save it again or use the data in any other way.
+</p>
+
+<h2>load_rel('<var>name</var>' = false)</h2>
+
+<p>
+	Loads the related records of this object.
+	The <var>name</var> specifies a certain relation to load relations for.
+	If the name parameter is omitted, all relations will be loaded.
+</p>
+
+<p>
+	The relations will be stored in the property with the name of the relation if it is not set (not used).
+	Otherwise you can fetch the related objects using <dfn>get_related()</dfn>.
+</p>
+
+<code>
+$record->load_rel();<br />
+print_r($record); // OK, this prints a lot, use a <a href="#print_r"><u>special version of print_r</u></a> that omits the IgnitedRecord object among others<br />
+// Result:<br />
+// IgnitedRecord_record Object (<br />
+// &nbsp;&nbsp;&nbsp;&nbsp;...<br />
+// &nbsp;&nbsp;&nbsp;&nbsp;[title] => 'Index',<br />
+// &nbsp;&nbsp;&nbsp;&nbsp;[data] => IgnitedRecord_record Object (<br />
+// &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br />
+// &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[contents] => 'Here is the contents of the page'<br />
+// &nbsp;&nbsp;&nbsp;&nbsp;)<br />
+// )
+</code>
+
+<h2>load_related('<var>name</var>' = false)</h2>
+
+<p>
+	Loads the related records for the relation with the name <var>name</var>. Alias for <dfn>load_rel()</dfn>.
+</p>
+
+<h2>get_related('<var>name</var>')</h2>
+
+<p>
+	Returns the related records from the relation with the name <var>name</var>.
+	Depending on if it is a Belongs To, Has Many, Has One or Has And Belongs To Many, the result can be an array or an IgnitedRecord_record.
+	If the relation is not loaded, it will be loaded.
+</p>
+
+<p>
+	If no related object(s) are found, false will be returned.
+</p>
+
+<h2>add_relationship(<var>record</var>, '<var>relation_name</var>' = false)</h2>
+
+<p>
+	This method establishes a relationship between this IgnitedRecord_record and the supplied <var>record</var>.
+	The <var>relationship_name</var> is the name of the desired relationship to use, if omitted IgnitedRecord will try to figure it out.<br />
+	Depending on the settings of the IgnitedRecord instance tied to this object, the type of relation can vary.
+</p>
+
+<p>
+	Ex.
+	If you have defined two relations, one to "posts" with Has Many and one to "moderators" with Has And Belongs To Many, and you pass an object of the type "posts", a Has Many relation will be established.<br />
+</p>
+
+<p>
+	If no relation is established with this record's table and <var>record</var>'s table in the Ignitedrecord instance (the model attached to <strong>this</strong> record), no relation will be formed.
+</p>
+
+<h2>add('<var>relation_name</var>', <var>record</var>)</h2>
+
+<p>
+	Somewhat of a shorthand for <dfn>add_relationship</dfn>, but requires the relationship name.
+</p>
+
+<code>
+$obj-&gt;add('child',$object);
+</code>
+
+<h2>remove_relationship(<var>record</var>, '<var>relation_name</var>' = false)</h2>
+
+<p>
+	If a relation has been established between this record and <var>record</var>, it will be removed.
+	The <var>relation_name</var> is the name of the specific relation to remove, if omitted IgnitedRecord will try to figure it out.
+	If no relation is defined (in the model attached to <strong>this</strong> record) or established betwen the two records, nothing is done.
+</p>
+
+<h2>remove('<var>relation_name</var>', <var>record</var>)</h2>
+
+<p>
+	Shorthand for <dfn>remove_relationship()</dfn>, but requires the relationship name.
+</p>
+
+&nbsp;
+
+<h1><a name="behaviours">Behaviours</a></h1>
+
+<p><strong>Coming soon</strong></p>
+
+<p>
+	I haven't made this section yet, but if you want to check out on how to make a behaviour, look at
+	<kbd>$__act_as</kbd>,
+	<kbd>$__child_class_helpers</kbd> and
+	<dfn>_load_behaviours()</dfn>
+	in IgnitedRecord.<br />
+	An example is the bundled IgnitedRecord_tree behaviour.
+</p>
+	
+
+<h2><a name="hooks">Hooks</a></h2>
+
+<p>
+	The hooks are places where you can add your own code to execute between different parts of IgnitedRecord.<br />
+	Trigger is maybe a more fitting description, but you have a hook and you attach your code to the hook (sort of hanging your code there and then when the hook is called, the code on the hook will be called :P ).
+</p>
+
+<p>
+	To add some code to a hook you first have to place the code in a separate function/method which you then can add to the hook.<br />
+	The second step is to register your function with the help of the <dfn>add_hook()</dfn> method:
+</p>
+
+<p><strong>add_hook('<var>hook_name</var>', '<var>function_name</var>', <var>priority</var> = 10)</strong></p>
+
+<p>
+Method variant:<br />
+<strong>
+	add_hook('<var>hook_name</var>', array(<var>object</var>, '<var>method_name</var>'), <var>priority</var> = 10)
+</strong>
+</p>
+
+<p>
+	The higher the priority number, the lower priority the hooked code will have.
+	The hooked code will be run in order with the lowest priority number first
+	(and if two hooks have the same priority, the one added first will be run first).
+</p>
+
+<p>
+	Example:
+</p>
+
+<code>
+function add_prop(&amp;$object){ // the ampersand is important, it is required for the reference to work (at least for scalars, depending on PHP version)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;$object-&gt;added_prop = 'We have added this!';<br />
+}<br />
+$this-&gt;page-&gt;add_hook('post_get',array($this,'add_prop'));<br />
+$rec = $this-&gt;page-&gt;get();<br />
+echo $rec-&gt;added_prop; // will echo "We have added this!"
+</code>
+
+<p>
+	Here are the hooks, their names, arguments and description:
+</p>
+
+<table cellpadding="0" cellspacing="1" border="0" class="tableborder">
+<tr>
+	<th>Hook</th>
+	<th>Arguments</th>
+	<th>Description</th>
+</tr>
+<tr>
+	<td class="td">pre_get</td>
+	<td class="td"></td>
+	<td class="td">This hook is run before the <dfn>get()</dfn> method does anything</td>
+</tr>
+<tr>
+	<td class="td">post_get</td>
+	<td class="td">
+		<ul>
+			<li>reference to generated object</li>
+		</ul>
+	</td>
+	<td class="td">This hook is run after the <dfn>get()</dfn> method has fetched and instantiated data</td>
+</tr>
+<tr>
+	<td class="td">pre_find</td>
+	<td class="td">
+		<ul>
+			<li>find id</li>
+		</ul>
+	</td>
+	<td class="td">This hook is run before the <dfn>find()</dfn> method does anything</td>
+</tr>
+<tr>
+	<td class="td">post_find</td>
+	<td class="td">
+		<ul>
+			<li>find id</li>
+			<li>reference to generated object</li>
+		</ul>
+	</td>
+	<td class="td">This hook is run after the <dfn>find()</dfn> method has fetched and instantiated data</td>
+</tr>
+<tr>
+	<td class="td">pre_find_by</td>
+	<td class="td">
+		<ul>
+			<li>reference to where array</li>
+		</ul>
+	</td>
+	<td class="td">This hook is run before the <dfn>find_by()</dfn> method does anything</td>
+</tr>
+<tr>
+	<td class="td">post_find_by</td>
+	<td class="td">
+		<ul>
+			<li>where array</li>
+			<li>reference to generated object</li>
+		</ul>
+	</td>
+	<td class="td">This hook is run after the <dfn>find_by()</dfn> method has fetched and instantiated data</td>
+</tr>
+<tr>
+	<td class="td">pre_find_by_sql</td>
+	<td class="td">
+		<ul>
+			<li>reference to sql string</li>
+		</ul>
+	</td>
+	<td class="td">This hook is run before the <dfn>find_by_sql()</dfn> method does anything</td>
+</tr>
+<tr>
+	<td class="td">post_find_by_sql</td>
+	<td class="td">
+		<ul>
+			<li>sql string</li>
+			<li>reference to generated object</li>
+		</ul>
+	</td>
+	<td class="td">This hook is run after the <dfn>find_by_sql()</dfn> method has fetched and instantiated data</td>
+</tr>
+<tr>
+	<td class="td">pre_find_all</td>
+	<td class="td"></td>
+	<td class="td">This hook is run before the <dfn>find_all()</dfn> method does anything</td>
+</tr>
+<tr>
+	<td class="td">post_find_all</td>
+	<td class="td">
+		<ul>
+			<li>reference to return array</li>
+		</ul>
+	</td>
+	<td class="td">This hook is run after the <dfn>find_all()</dfn> method has fetched and instantiated data</td>
+</tr>
+<tr>
+	<td class="td">pre_find_all_by</td>
+	<td class="td">
+		<ul>
+			<li>reference to where array</li>
+		</ul>
+	</td>
+	<td class="td">This hook is run before the <dfn>find_all_by()</dfn> method does anything</td>
+</tr>
+<tr>
+	<td class="td">post_find_all_by</td>
+	<td class="td">
+		<ul>
+			<li>where array</li>
+			<li>reference to return array</li>
+		</ul>
+	</td>
+	<td class="td">This hook is run after the <dfn>find_all_by()</dfn> method has fetched and instantiated data</td>
+</tr>
+<tr>
+	<td class="td">pre_find_all_by_sql</td>
+	<td class="td">
+		<ul>
+			<li>reference to sql string</li>
+		</ul>
+	</td>
+	<td class="td">This hook is run before the <dfn>find_all_by_sql()</dfn> method does anything</td>
+</tr>
+<tr>
+	<td class="td">post_find_all_by_sql</td>
+	<td class="td">
+		<ul>
+			<li>sql string</li>
+			<li>reference to return array</li>
+		</ul>
+	</td>
+	<td class="td">This hook is run after the <dfn>find_all_by_sql()</dfn> method has fetched and instantiated data</td>
+</tr>
+<tr>
+	<td class="td">post_new_record</td>
+	<td class="td">
+		<ul>
+			<li>reference to new object</li>
+		</ul>
+	</td>
+	<td class="td">This hook is run after the <dfn>new_record()</dfn> method has instantiated data</td>
+</tr>
+<tr>
+	<td class="td">save_pre_strip_data</td>
+	<td class="td">
+		<ul>
+			<li>reference to object to save</li>
+		</ul>
+	</td>
+	<td class="td">This hook is run before the <dfn>_strip_data()</dfn> method has returned a clean array</td>
+</tr>
+<tr>
+	<td class="td">save_post_strip_data</td>
+	<td class="td">
+		<ul>
+			<li>reference to data array to save</li>
+		</ul>
+	</td>
+	<td class="td">This hook is run after the <dfn>_strip_data()</dfn> method has returned a clean array</td>
+</tr>
+<tr>
+	<td class="td">save_pre_insert</td>
+	<td class="td">
+		<ul>
+			<li>reference to data array to save</li>
+		</ul>
+	</td>
+	<td class="td">This hook is run before the <dfn>save()</dfn> method has called <dfn>db::insert()</dfn></td>
+</tr>
+<tr>
+	<td class="td">save_post_insert</td>
+	<td class="td">
+		<ul>
+			<li>reference to object which has been inserted</li>
+		</ul>
+	</td>
+	<td class="td">This hook is run after the <dfn>db::insert()</dfn> has inserted the clean data array</td>
+</tr>
+<tr>
+	<td class="td">save_pre_update</td>
+	<td class="td">
+		<ul>
+			<li>reference to data array to save</li>
+		</ul>
+	</td>
+	<td class="td">This hook is run before the <dfn>save()</dfn> method has called <dfn>db::update()</dfn></td>
+</tr>
+<tr>
+	<td class="td">save_post_update</td>
+	<td class="td">
+		<ul>
+			<li>reference to object which has been updated</li>
+		</ul>
+	</td>
+	<td class="td">This hook is run after the <dfn>db::update()</dfn> has saved the clean data array</td>
+</tr>
+<tr>
+	<td class="td">save_abort</td>
+	<td class="td">
+		<ul>
+			<li>reference to object on which the save failed</li>
+		</ul>
+	</td>
+	<td class="td">This hook is run if the <dfn>save()</dfn> method detect that the object is unchanged or empty and aborts</td>
+</tr>
+<tr>
+	<td class="td">post_save</td>
+	<td class="td">
+		<ul>
+			<li>reference to object which has been updated</li>
+		</ul>
+	</td>
+	<td class="td">This hook is run after the <dfn>save()</dfn> method has saved the clean data array</td>
+</tr>
+<tr>
+	<td class="td">pre_update</td>
+	<td class="td">
+		<ul>
+			<li>reference to object to refresh</li>
+		</ul>
+	</td>
+	<td class="td">This hook is run before the <dfn>update()</dfn> has created the new refreshed object</td>
+</tr>
+<tr>
+	<td class="td">post_update</td>
+	<td class="td">
+		<ul>
+			<li>reference to newly created object</li>
+		</ul>
+	</td>
+	<td class="td">This hook is run after the <dfn>update()</dfn> method has loaded and instantiated the object</td>
+</tr>
+<tr>
+	<td class="td">pre_delete</td>
+	<td class="td">
+		<ul>
+			<li>reference to object to be deleted</li>
+		</ul>
+	</td>
+	<td class="td">This hook is run before the <dfn>delete()</dfn> has done anything</td>
+</tr>
+<tr>
+	<td class="td">pre_delete_query</td>
+	<td class="td">
+		<ul>
+			<li>reference to object to be deleted</li>
+		</ul>
+	</td>
+	<td class="td">This hook is run after the <dfn>delete()</dfn> method has removed all relations from the object to be deleted</td>
+</tr>
+<tr>
+	<td class="td">post_deleted</td>
+	<td class="td">
+		<ul>
+			<li>reference to deleted object</li>
+		</ul>
+	</td>
+	<td class="td">This hook is run after the <dfn>delete()</dfn> method has deleted the object</td>
+</tr>
+</table>
+
+&nbsp;
+
+<h1><a name="print_r">u_print_r()</a></h1>
+
+<p>This is a version of print_r that accepts an ignore array: (Found on php.net)</p>
+
+<code>
+/**<br />
+&nbsp;* Customizable print_r variant.<br />
+&nbsp;*<br />
+&nbsp;* Use only the $subject and $ignore parameters, the others are used internally<br />
+&nbsp;*<br />
+&nbsp;* @param $subject The object/variable/array to be printed<br />
+&nbsp;* @param $ignore An array with the keys to ignore<br />
+&nbsp;* @param $depth Current depth (used in recursion)<br />
+&nbsp;* @param $refChain A chain of printed objects to avoid recursion<br />
+&nbsp;*/<br />
+<span class="keyword">function </span><span class="default">u_print_r</span><span class="keyword">(</span><span class="default">$subject</span><span class="keyword">, </span><span class="default">$ignore </span><span class="keyword">= array(), </span><span class="default">$depth </span><span class="keyword">= </span><span class="default">1</span><span class="keyword">, </span><span class="default">$refChain </span><span class="keyword">= array()) <br />
+
+{<br />
+&nbsp;&nbsp;&nbsp; if (</span><span class="default">$depth </span><span class="keyword">&gt; </span><span class="default">20</span><span class="keyword">) return;<br />
+&nbsp;&nbsp;&nbsp; if (</span><span class="default">is_object</span><span class="keyword">(</span><span class="default">$subject</span><span class="keyword">)) {<br />
+&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; foreach (</span><span class="default">$refChain </span><span class="keyword">as </span><span class="default">$refVal</span><span class="keyword">)<br />
+
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; if (</span><span class="default">$refVal </span><span class="keyword">=== </span><span class="default">$subject</span><span class="keyword">) {<br />
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; echo </span><span class="string">"*RECURSION*\n"</span><span class="keyword">;<br />
+
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; return;<br />
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; }<br />
+&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; </span><span class="default">array_push</span><span class="keyword">(</span><span class="default">$refChain</span><span class="keyword">, </span><span class="default">$subject</span><span class="keyword">);<br />
+
+&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; echo </span><span class="default">get_class</span><span class="keyword">(</span><span class="default">$subject</span><span class="keyword">) . </span><span class="string">" Object ( \n"</span><span class="keyword">;<br />
+&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; </span><span class="default">$subject </span><span class="keyword">= (array) </span><span class="default">$subject</span><span class="keyword">;<br />
+
+&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; foreach (</span><span class="default">$subject </span><span class="keyword">as </span><span class="default">$key </span><span class="keyword">=&gt; </span><span class="default">$val</span><span class="keyword">)<br />
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; if (</span><span class="default">is_array</span><span class="keyword">(</span><span class="default">$ignore</span><span class="keyword">) &amp;&amp; !</span><span class="default">in_array</span><span class="keyword">(</span><span class="default">$key</span><span class="keyword">, </span><span class="default">$ignore</span><span class="keyword">, </span><span class="default">1</span><span class="keyword">)) {<br />
+
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; echo </span><span class="default">str_repeat</span><span class="keyword">(</span><span class="string">" "</span><span class="keyword">, </span><span class="default">$depth </span><span class="keyword">* </span><span class="default">4</span><span class="keyword">) . </span><span class="string">'['</span><span class="keyword">;<br />
+
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; if (</span><span class="default">$key</span><span class="keyword">{</span><span class="default">0</span><span class="keyword">} == </span><span class="string">"\0"</span><span class="keyword">) {<br />
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="default">$keyParts </span><span class="keyword">= </span><span class="default">explode</span><span class="keyword">(</span><span class="string">"\0"</span><span class="keyword">, </span><span class="default">$key</span><span class="keyword">);<br />
+
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; echo </span><span class="default">$keyParts</span><span class="keyword">[</span><span class="default">2</span><span class="keyword">] . ((</span><span class="default">$keyParts</span><span class="keyword">[</span><span class="default">1</span><span class="keyword">] == </span><span class="string">'*'</span><span class="keyword">)&nbsp; ? </span><span class="string">':protected' </span><span class="keyword">: </span><span class="string">':private'</span><span class="keyword">);<br />
+
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; } else<br />
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; echo </span><span class="default">$key</span><span class="keyword">;<br />
+
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; echo </span><span class="string">'] =&gt; '</span><span class="keyword">;<br />
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="default">u_print_r</span><span class="keyword">(</span><span class="default">$val</span><span class="keyword">, </span><span class="default">$ignore</span><span class="keyword">, </span><span class="default">$depth </span><span class="keyword">+ </span><span class="default">1</span><span class="keyword">, </span><span class="default">$refChain</span><span class="keyword">);<br />
+
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; }<br />
+&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; echo </span><span class="default">str_repeat</span><span class="keyword">(</span><span class="string">" "</span><span class="keyword">, (</span><span class="default">$depth </span><span class="keyword">- </span><span class="default">1</span><span class="keyword">) * </span><span class="default">4</span><span class="keyword">) . </span><span class="string">")\n"</span><span class="keyword">;<br />
+
+&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; </span><span class="default">array_pop</span><span class="keyword">(</span><span class="default">$refChain</span><span class="keyword">);<br />
+&nbsp;&nbsp;&nbsp; } elseif (</span><span class="default">is_array</span><span class="keyword">(</span><span class="default">$subject</span><span class="keyword">)) {<br />
+&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; echo </span><span class="string">"Array ( \n"</span><span class="keyword">;<br />
+
+&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; foreach (</span><span class="default">$subject </span><span class="keyword">as </span><span class="default">$key </span><span class="keyword">=&gt; </span><span class="default">$val</span><span class="keyword">)<br />
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; if (</span><span class="default">is_array</span><span class="keyword">(</span><span class="default">$ignore</span><span class="keyword">) &amp;&amp; !</span><span class="default">in_array</span><span class="keyword">(</span><span class="default">$key</span><span class="keyword">, </span><span class="default">$ignore</span><span class="keyword">, </span><span class="default">1</span><span class="keyword">)) {<br />
+
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; echo </span><span class="default">str_repeat</span><span class="keyword">(</span><span class="string">" "</span><span class="keyword">, </span><span class="default">$depth </span><span class="keyword">* </span><span class="default">4</span><span class="keyword">) . </span><span class="string">'[' </span><span class="keyword">. </span><span class="default">$key </span><span class="keyword">. </span><span class="string">'] =&gt; '</span><span class="keyword">;<br />
+
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; </span><span class="default">u_print_r</span><span class="keyword">(</span><span class="default">$val</span><span class="keyword">, </span><span class="default">$ignore</span><span class="keyword">, </span><span class="default">$depth </span><span class="keyword">+ </span><span class="default">1</span><span class="keyword">, </span><span class="default">$refChain</span><span class="keyword">);<br />
+
+&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; }<br />
+&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; echo </span><span class="default">str_repeat</span><span class="keyword">(</span><span class="string">" "</span><span class="keyword">, (</span><span class="default">$depth </span><span class="keyword">- </span><span class="default">1</span><span class="keyword">) * </span><span class="default">4</span><span class="keyword">) . </span><span class="string">")\n"</span><span class="keyword">;<br />
+
+&nbsp;&nbsp;&nbsp; } else<br />
+&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; echo </span><span class="default">$subject </span><span class="keyword">. </span><span class="string">"\n"</span><span class="keyword">;</span><br />
+}
+</code>
+
+<p>
+	The recommended ignore array is this: <br />
+	array('__instance','__relations','__relation_properties','__data','mpttree','tree')<br />
+	The mpttree and the tree are properties that the <kbd>IgnitedRecord_tree</kbd> behaviour uses<br />
+</p>
+
+&nbsp;
+
+<h1><a name="license">License</a></h1>
+
+
+<p>Copyright (c) 2008, Martin Wernstahl<br />
+All rights reserved.<br />
+<br />
+Redistribution and use in source and binary forms, with or without<br />
+modification, are permitted provided that the following conditions are met:<br />
+<ol>
+<li>Redistributions of source code must retain the above copyright<br />
+notice, this list of conditions and the following disclaimer.</li>
+<li>Redistributions in binary form must reproduce the above copyright<br />
+notice, this list of conditions and the following disclaimer in the<br />
+documentation and/or other materials provided with the distribution.</li>
+<li>The name of Martin Wernstahl may not be used to endorse or promote products<br />
+derived from this software without specific prior written permission.</li>
+</ol>
+THIS SOFTWARE IS PROVIDED BY Martin Wernstahl ''AS IS'' AND ANY<br />
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED<br />
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE<br />
+DISCLAIMED. IN NO EVENT SHALL Martin Wernstahl BE LIABLE FOR ANY<br />
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES<br />
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;<br />
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND<br />
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT<br />
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS<br />
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.<br />
+</p>
+
+&nbsp;
+
+<h1><a name="change">Change Log</a></h1>
+
+<h2>Version 0.1.1</h2>
+
+<p>Release Date: June 26, 2008</p>
+
+<ul>
+    <li>Added the method <dfn>uid()</dfn> to IgnitedRecord_record</li>
+    <li>Added <dfn>yamlfactory()</dfn></li>
+    <li>Added calls to <dfn>DB_result::free_result()</dfn> in all get methods,
+        makes IgnitedRecord hog less memory and it becomes a bit faster</li>
+    <li>Made the includes of the behaviour files relative to the <kbd>ignitedrecord.php</kbd> path</li>
+    <li>Remade the <dfn>factory()</dfn> method, it now takes the tablename as the first parameter,
+        and it is more effective, no more eval()</li>
+    <li><dfn>_get_modelname()</dfn> now searches for models with tablename or singular of tablename
+        both among the defined classes <strong>and</strong> in the CI object (propertyname = modelname)</li>
+    <li>Tree behaviour: 
+        <ul>
+            <li>Added <dfn>is_child_of()</dfn> and <dfn>is_descendant_of()</dfn></li>
+            <li>Made the root cache per model instead of per object</li>
+            <li>id column is now fetched from the IgnitedRecord object</li>
+            <li>The behaviour now checks if MPTtree already is loaded before loading</li>
+            <li>Fixed <dfn>is_orphan()</dfn></li>
+        </ul>
+    </il>
+    <li>Fixed a typo in <dfn>find_all_by()</dfn>, forgot db and a 1 too much</li>
+</ul>
+
+<h2>Version 0.1.0</h2>
+
+<p>Release Date: May 30, 2008</p>
+
+<ul>
+	<li>Limited support for multiple primary keys has been implemented.</li>
+	<li><dfn>save()</dfn> now returns <kbd>true</kbd> if the INSERT/UPDATE query succeeded.</li>
+	<li>Added <dfn>set_belongs_to()</dfn>, <dfn>set_has_many()</dfn>, <dfn>set_has_one()</dfn> and <dfn>set_habtm()</dfn> (Has And Belongs To Many).</li>
+	<li><dfn>factory()</dfn> does not need the double underscores in the property names, double underscores are automatically added</li>
+	<li><dfn>save()</dfn> now only saves the record if it has been edited.</li>
+	<li>Because of the new <dfn>save()</dfn>, a <kbd>$force</kbd> option has been added.</li>
+	<li>The IgnitedRecord_tree have got <dfn>get_descendants()</dfn>.</li>
+	<li>A custom loader has been implemented.</li>
+	<li>Bugfixes:
+	<ul>
+		<li>id column does not exist when creating a new record</li>
+		<li>Misspellings and typos in the manual</li>
+	</ul>
+	</li>
+</ul>
+
+<h2>Version 0.1.0 RC 4</h2>
+
+<p>Release Date: May 3, 2008</p>
+
+<ul>
+	<li>Remade the structure for storing the relations, now supports multiple relations to the same table with the same type of relations (provided their relation names are different), check <a href="#relations">Establish Relationships</a></li>
+	<li>Added error messages if a method was not found in the <dfn>__call()</dfn> methods</li>
+	<li>Loading of relations logs a warning message if a relation between the tables does not exist</li>
+	<li>Improved the <dfn>_strip_data()</dfn> method a bit</li>
+	<li>Added a custom <kbd>MY_Loader.php</kbd></li>
+	<li>The <dfn>factory()</dfn> method now prepends a double underscore on all propertynames in the second parameter</li>
+	<li>Bugfixes:
+	<ul>
+		<li><dfn>hooks()</dfn> argument missing</li>
+		<li>instance property not found</li>
+		<li>__relation_properties is not an array</li>
+	</ul>
+	</li>
+</ul>
+
+<h2>Version 0.1.0 RC 3</h2>
+
+<p>Release Date: May 1, 2008</p>
+
+<ul>
+	<li>Modified the hooks system, so references do work (if the recieving method takes the arguments by reference)</li>
+	<li>Corrected the notice "Only variable references should be returned by reference"</li>
+	<li>Made a check with references under PHP 4 (got db working, so now I can really test with PHP 4), so I believe they work as they should</li>
+</ul>
+
+<h2>Version 0.1.0 RC 2</h2>
+
+<p>Release Date: April 30, 2008</p>
+
+<ul>
+	<li>Finally a name for this model, IgnitedRecord!</li>
+	<li>The data is now sanitized before insert/update, it removes all properties that doesn't match the field names</li>
+	<li>Added the <dfn>get()</dfn> method</li>
+	<li>Added the <dfn>factory()</dfn> method, creates a new model instance from supplied settings</li>
+	<li>Added the <dfn>in_db()</dfn> method (IgnitedRecord_record)</li>
+	<li>Added Act_As, to enable easier customization of the IgnitedRecord class.</li>
+	<li>Added a Child_class_helper array which contains all helper class names to be assigned to the child 	classes.</li>
+	<li>Implemented a basic hook system.</li>
+	<li>Added a lot of hooks into the main IgnitedRecord class.</li>
+	<li>Added the ability to name relations, this enables the use of relations referring to self and has_many, belongs_to, has_one and has_and_belongs_to_many can relate to the same table without them overwriting eachother (useful for the Adjacency tree).</li>
+	<li>Created a MPTtree behaviour, IgnitedRecord_tree (requires <a href="http://www.cibase.info/index.php/code/details/11">MPTtree</a>)</li>
+</ul>
+
+<h2>Version 0.1.0 RC 1</h2>
+
+<p>Release Date: April 5, 2008</p>
+
+<ul>
+	<li>Initial Release</li>
+</ul>
+
+</div>
+<!-- END CONTENT -->
+
+
+<div id="footer">
+<p>
+<a href="#top">Top of Page</a>&nbsp;&nbsp;&nbsp;&middot;&nbsp;&nbsp;
+<a href="#">User Guide Home</a>
+</p>
+<p>Copyright &copy; 2008, Martin Wernstahl &lt;m4rw3r at gmail dot com&gt;</p>
+<p>IgnitedRecord is released under the BSD License</p>
+
+<p><a href="http://codeigniter.com">CodeIgniter</a> &nbsp;&middot;&nbsp; Copyright &#169; 2007 &nbsp;&middot;&nbsp; <a href="http://ellislab.com/">Ellislab, Inc.</a></p>
+</div>
+
+</body>
+</html>

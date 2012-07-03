@@ -1,0 +1,211 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv='expires' content='-1' />
+	<meta http-equiv= 'pragma' content='no-cache' />
+	
+	<title>Configure Relations - IgnitedRecord User Guide Version 0.2.0</title>
+	
+	<link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+	<link rel="Shortcut Icon" href="../images/favicon.ico">
+	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+	
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../nav.js"></script>
+	<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+	$('#nav').hide();
+	$('#toggle_toc').click(function(){
+		$('#nav').slideToggle();
+	})
+});
+	</script>
+</head>
+<body>
+<div id="nav">
+	<script type="text/javascript">menu('../');</script>
+</div>
+<div id="nav2"><a name="top"></a><a id="toggle_toc"><img src="../images/nav_toggle.jpg" width="153" height="44" border="0" title="Toggle Table of Contents" alt="Toggle Table of Contents" /></a></div>
+<div id="masthead">
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td><h1>IgnitedRecord User Guide Version 0.2.0</h1></td>
+<td id="breadcrumb_right"><a href="../toc.html">Table of Contents Page</a></td>
+</tr>
+</table>
+</div>
+<!-- END NAVIGATION -->
+
+
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td id="breadcrumb">
+<a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord Home</a> &nbsp;&#8250;&nbsp; IgnitedRecord User Guide &nbsp;&#8250;&nbsp; Configure Relations
+</td>
+<td id="searchbox"></td>
+</tr>
+</table>
+
+<div id="content">
+	<h1>Configure Relations</h1>
+	
+	<p>
+		Relation settings can be specified in two ways; in properties or with methods:
+	</p>
+	
+	<h2>Methods</h2>
+	
+	<p>
+		The methods used to specify relations are the following:
+	</p>
+	
+	<ul>
+		<li><dfn>has_many()</dfn></li>
+		<li><dfn>has_one()</dfn></li>
+		<li><dfn>belongs_to()</dfn></li>
+		<li><dfn>habtm()</dfn></li>
+		<li><dfn>has_and_belongs_to_many()</dfn></li>
+	</ul>
+	
+	<p>
+		The first parameter is the relation name, and the second (optional) parameter is the relation setting array.<br />
+		All these methods return IR_RelProperty objects, which have methods to specify settings (and if used in chains, they make for less code than the array option).
+	</p>
+	
+	<p>
+		The relation settings array concists of key and values,
+		the keys are the method names below, and the values the data passed to them.
+	</p>
+	
+	<p>
+		If only a relation name is specified, IgnitedRecord will figure out the other values.
+	</p>
+	
+	<p>
+		The methods the IR_RelProperty objects provides are the following (and all are chainable):
+	</p>
+	
+	<table cellpadding="0" cellspacing="1" border="0" class="tableborder">
+		<tr>
+			<th>Methods</th>
+			<th>Description</td>
+		</tr>
+		<tr>
+			<td class="td"><dfn>table()</dfn></td>
+			<td class="td">Specifies the table to link to</td>
+		</tr>
+		<tr>
+			<td class="td"><dfn>model()</dfn></td>
+			<td class="td">Specifies the model to use when instantiating related objects</td>
+		</tr>
+		<tr>
+			<td class="td"><dfn>foreign_key()</dfn> (alias: <dfn>fk()</dfn>)</td>
+			<td class="td">Specifies the foreign column linking the two tables together</td>
+		</tr>
+		<tr>
+			<th>Methods only for <abbr title="Has And Belongs To Many">habtm</abbr>:</th>
+			<td class="td"></td>
+		</tr>
+		<tr>
+			<td class="td"><dfn>join_table()</dfn></td>
+			<td class="td">Specifies the table to use when linking the two tables together (ie. join table)</td>
+		</tr>
+		<tr>
+			<td class="td"><dfn>foreign_key()</dfn> (alias: <dfn>fk()</dfn>)</td>
+			<td class="td">Specifies the foreign column linking this table to the join table</td>
+		</tr>
+		<tr>
+			<td class="td"><dfn>related_foreign_key()</dfn> (alias: <dfn>related_fk()</dfn> or <dfn>r_fk()</dfn>)</td>
+			<td class="td">Specifies the foreign column linking the related table to the join table</td>
+		</tr>
+	</table>
+	
+	<p>
+		Example:
+	</p>
+	
+	<code>
+		$this-&gt;file-&gt;belongs_to('group')-&gt;fk('gid');<br />
+		// array alternative:<br />
+		$this-&gt;file-&gt;belongs_to('group',array('fk' => 'gid'));
+	</code>
+	
+	<h2>Properties</h2>
+	
+	<p>
+		The relations can be specified in numerous ways in their respective properties.<br />
+		The relation name or the name of the related table is the data required to establish a relationship.
+	</p>
+	
+	<p>
+		Here is a list of the different ways:
+	</p>
+	
+	<h4>Single relation:</h4>
+	
+	<code>
+		var $has_many = 'books';
+	</code>
+	
+	<p>
+		This specifies the relation name,
+		which IgnitedRecord then will use to figure out the rest.
+	</p>
+	
+	<h4>Multiple relations:</h4>
+	
+	<code>
+		var $has_many = array('books', 'videos');
+	</code>
+	
+	<p>
+		The ways above cannot override any settings, but these can:
+	</p>
+	
+	<h4>Override defaults:</h4>
+	
+	<p>
+		The key names of the settings are the same as the names of the methods
+		which specifies them in an <kbd>IR_RelProperty</kbd>.
+	</p>
+	
+	<code>
+		var $has_many = array('table' => 'people', 'model' => 'person');
+	</code>
+	
+	<h4>Override defaults, multiple:</h4>
+	
+	<code>
+		var $has_many = array(<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array('table' => 'people', 'model' => 'person'),<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array('name' => 'children', 'table' => 'tree', 'fk' => 'parent_id')<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;);
+	</code>
+	
+	<h4>Mixed:</h4>
+	
+	<code>
+		var $has_many = array(<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array('table' => 'people', 'model' => 'person'),<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'books'<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;);
+	</code>
+	
+	<h2>Defaults</h2>
+	
+	<p>
+		The default values are specified under their respective relation type.
+	</p>
+</div>
+
+
+<div id="footer">
+<p><a href="#top">Top of Page</a></p>
+<p><a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord</a>  &nbsp;&middot;&nbsp; Copyright &#169; 2008 &nbsp;&middot;&nbsp; Martin Wernstahl</p>
+<p><a href="http://codeigniter.com">CodeIgniter</a> &nbsp;&middot;&nbsp; Copyright &#169; 2006-2008 &nbsp;&middot;&nbsp; <a href="http://ellislab.com/">Ellislab, Inc.</a></p>
+</div>
+
+
+</body>
+</html>

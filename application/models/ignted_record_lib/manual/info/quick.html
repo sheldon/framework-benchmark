@@ -1,0 +1,201 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv='expires' content='-1' />
+	<meta http-equiv= 'pragma' content='no-cache' />
+	
+	<title>Quick Start - IgnitedRecord User Guide Version 0.2.0</title>
+	
+	<link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+	<link rel="Shortcut Icon" href="../images/favicon.ico">
+	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+	
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../nav.js"></script>
+	<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+	$('#nav').hide();
+	$('#toggle_toc').click(function(){
+		$('#nav').slideToggle();
+	})
+});
+	</script>
+</head>
+<body>
+<div id="nav">
+	<script type="text/javascript">menu('../');</script>
+</div>
+<div id="nav2"><a name="top"></a><a id="toggle_toc"><img src="../images/nav_toggle.jpg" width="153" height="44" border="0" title="Toggle Table of Contents" alt="Toggle Table of Contents" /></a></div>
+<div id="masthead">
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td><h1>IgnitedRecord User Guide Version 0.2.0</h1></td>
+<td id="breadcrumb_right"><a href="../toc.html">Table of Contents Page</a></td>
+</tr>
+</table>
+</div>
+<!-- END NAVIGATION -->
+
+
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td id="breadcrumb">
+<a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord Home</a> &nbsp;&#8250;&nbsp; IgnitedRecord User Guide &nbsp;&#8250;&nbsp; Quick Start
+</td>
+<td id="searchbox"></td>
+</tr>
+</table>
+
+<div id="content">
+	<h1>Quick Start</h1>
+	
+	<p>
+		Here is a quick guide, we'll try a simple <abbr title="Has And Belongs To Many">habtm</abbr> relation:
+	</p>
+	
+	<h2>Install</h2>
+	
+	<p>
+		Copy <dfn>application/models/ignitedrecord</dfn> to your <dfn>models</dfn> directory.
+	</p>
+	
+	<h2>Loading IgnitedRecord</h2>
+	
+	<p>
+		Create a new Controller, and add this in the constructor:
+	</p>
+	
+	<code>
+		$this-&gt;load-&gt;model('ignitedrecord/ignitedrecord');<br />
+		$this-&gt;load-&gt;model('user');
+	</code>
+	
+	<p>
+		That will load IgnitedRecord and a model called 'User'.
+	</p>
+	
+	<h2>The User Model</h2>
+	
+	<p>
+		Create a new Model and name it User, let it extend IgnitedRecord:
+	</p>
+	
+	<code>
+		class User extends IgnitedRecord{<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;var $has_and_belongs_to_many = 'groups';<br />
+		}
+	</code>
+	
+	<p>
+		This say that it has and belongs to many groups (ie. a many-to-many relationship).<br />
+		Save it as <kbd>user.php</kbd> in your <dfn>app/models</dfn> directory.
+	</p>
+	
+	<h2>The Action</h2>
+	
+	<p>
+		Create a new function in the controller we created earlier, and add this code into it:
+	</p>
+	
+	<code>
+		// load the record with id 1<br />
+		$rec1 =&amp; $this-&gt;user-&gt;find(1);<br />
+		<br />
+		echo &#x27;user with id #1: &#x27;.$rec1-&gt;name.&#x27;&lt;hr&gt;&#x27;;<br />
+		echo &#x27;user &#x27;. $rec1-&gt;name .&#x27; belongs to groups:&lt;br&gt;&#x27;;<br />
+		<br />
+		// now, create a query object that fetches all related groups:<br />
+		$related_recs =&amp; $rec1-&gt;related(&#x27;groups&#x27;);<br />
+		<br />
+		// go! fetch!<br />
+		foreach($related_recs-&gt;get() as $r)<br />
+		{<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;// print their names <br />
+		&nbsp;&nbsp;&nbsp;&nbsp;echo $r-&gt;name.&#x27;&lt;br&gt;&#x27;;<br />
+		}<br />
+		<br />
+		echo &#x27;&lt;hr&gt; all users:&lt;br&gt;&#x27;;<br />
+		<br />
+		// now fetch all users<br />
+		$recs = $this-&gt;user-&gt;find_all();<br />
+		foreach($recs as $r)<br />
+		{<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;echo $r-&gt;name.&#x27;&lt;br&gt;&#x27;;<br />
+		}
+	</code>
+	
+	<h2>Stuff the Database</h2>
+	
+	<p>
+		Now we only need to put something to load, run this SQL code:
+	</p>
+	
+	<code>
+		CREATE TABLE `groups` (<br />
+		&nbsp;&nbsp;`id` int(11) NOT NULL auto_increment,<br />
+		&nbsp;&nbsp;`name` text,<br />
+		&nbsp;&nbsp;PRIMARY KEY  (`id`)<br />
+		) TYPE=MyISAM;<br />
+		<br />
+		INSERT INTO `groups` VALUES (1, 'cool');<br />
+		INSERT INTO `groups` VALUES (2, 'not cool');<br />
+		<br />
+		<br />
+		CREATE TABLE `groups_users` (<br />
+		&nbsp;`id` int(11) NOT NULL auto_increment,<br />
+		&nbsp;`group_id` int(11) default NULL,<br />
+		&nbsp;`user_id` int(11) default NULL,<br />
+		&nbsp;PRIMARY KEY  (`id`)<br />
+		) TYPE=MyISAM;<br />
+		<br />
+		INSERT INTO `groups_users` VALUES (1, 1, 1);<br />
+		INSERT INTO `groups_users` VALUES (2, 1, 2);<br />
+		INSERT INTO `groups_users` VALUES (3, 2, 3);<br />
+		INSERT INTO `groups_users` VALUES (4, 2, 4);<br />
+		INSERT INTO `groups_users` VALUES (5, 2, 1);<br />
+		<br />
+		<br />
+		CREATE TABLE `users` (<br />
+		&nbsp;`id` int(11) NOT NULL auto_increment,<br />
+		&nbsp;`name` text,<br />
+		&nbsp;PRIMARY KEY  (`id`)<br />
+		) TYPE=MyISAM;<br />
+		<br />
+		INSERT INTO `users` VALUES (1, 'me');<br />
+		INSERT INTO `users` VALUES (2, 'you');<br />
+		INSERT INTO `users` VALUES (3, 'another guy');<br />
+		INSERT INTO `users` VALUES (4, 'a fourth');
+	</code>
+	
+	<h2>The Result:</h2>
+	
+	<p>
+		Here is the result from your controller action in pure HTML code:
+	</p>
+	
+	<code>
+		user with id #1: me<br />
+		&lt;hr&gt;<br />
+		user me belongs to groups:&lt;br&gt;<br />
+		cool&lt;br&gt;<br />
+		not cool&lt;br&gt;<br />
+		&lt;hr&gt;<br />
+		all users:&lt;br&gt;<br />
+		me&lt;br&gt;<br />
+		you&lt;br&gt;<br />
+		another guy&lt;br&gt;<br />
+		a fourth&lt;br&gt;
+	</code>
+</div>
+
+
+<div id="footer">
+<p><a href="#top">Top of Page</a></p>
+<p><a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord</a>  &nbsp;&middot;&nbsp; Copyright &#169; 2008 &nbsp;&middot;&nbsp; Martin Wernstahl</p>
+<p><a href="http://codeigniter.com">CodeIgniter</a> &nbsp;&middot;&nbsp; Copyright &#169; 2006-2008 &nbsp;&middot;&nbsp; <a href="http://ellislab.com/">Ellislab, Inc.</a></p>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,153 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv='expires' content='-1' />
+	<meta http-equiv= 'pragma' content='no-cache' />
+	
+	<title>Creating, Saving and Deleting Records - IgnitedRecord User Guide Version 0.2.0</title>
+	
+	<link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+	<link rel="Shortcut Icon" href="../images/favicon.ico">
+	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+	
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../nav.js"></script>
+	<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+	$('#nav').hide();
+	$('#toggle_toc').click(function(){
+		$('#nav').slideToggle();
+	})
+});
+	</script>
+</head>
+<body>
+<div id="nav">
+	<script type="text/javascript">menu('../');</script>
+</div>
+<div id="nav2"><a name="top"></a><a id="toggle_toc"><img src="../images/nav_toggle.jpg" width="153" height="44" border="0" title="Toggle Table of Contents" alt="Toggle Table of Contents" /></a></div>
+<div id="masthead">
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td><h1>IgnitedRecord User Guide Version 0.2.0</h1></td>
+<td id="breadcrumb_right"><a href="../toc.html">Table of Contents Page</a></td>
+</tr>
+</table>
+</div>
+<!-- END NAVIGATION -->
+
+
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td id="breadcrumb">
+<a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord Home</a> &nbsp;&#8250;&nbsp; IgnitedRecord User Guide &nbsp;&#8250;&nbsp; Creating, Saving and Deleting Records
+</td>
+<td id="searchbox"></td>
+</tr>
+</table>
+
+<div id="content">
+	<h1>Creating, Saving and Deleting Records</h1>
+	
+	<p>
+		To create, save and delete records, IgnitedRecord has a very straightforward approach:<br />
+		Four methods, each one very simple and their purposes are easy to understand.
+	</p>
+	
+	<h2>new_record([<var>data</var>])</h2>
+	
+	<p>
+		To create a new record, use the <dfn>new_record()</dfn> method like this:
+	</p>
+	
+	<code>
+		$rec = $this-&gt;users-&gt;new_record();
+	</code>
+	
+	<p>
+		$rec becomes a new instance of an <kbd>IR_record</kbd>, but not linked to a table row - yet.<br />
+		This record is empty (except for the data found in <var>data</var>), and you can edit it's properties as you like.
+	</p>
+	
+	<p>
+		The associative array <var>data</var> is assigned as properties on the object, like this:
+	</p>
+	
+	<code>
+		$rec = $this-&gt;track-&gt;new_record(array('name' => 'Jane Doe', 'artist' => 'Within Temptation'));<br />
+		echo $rec-&gt;name; // echos "Jane Doe"<br />
+		echo $rec-&gt;artist; // echos "Within Temptation"<br />
+		$rec-&gt;save();
+	</code>
+	
+	<h2>save()</h2>
+	
+	<p>
+		The <kbd>IR_record</kbd>s have the <dfn>save()</dfn> method,
+		this method performs either an INSERT or an UPDATE query,
+		depending on if the record exists.<br />
+		If the row the <kbd>IR_record</kbd> record links to does not exist,
+		it performs an INSERT and then links the object to the new row.
+		Otherwise it performs an UPDATE on the already existing row.
+	</p>
+	
+	<p>
+		When performing updates (<strong>NOT</strong> inserts!), changes to the primary key will not be reflected in the database.<br />
+		(This prevents you from doing a mess of all relationships between records)
+	</p>
+	
+	<p>
+		<dfn>save()</dfn> returns <kbd>true</kbd> if the insert/update succeeds,
+		otherwise <kbd>false</kbd>.
+	</p>
+	
+	<p>
+		Examples:
+	</p>
+	
+	<code>
+		$rec = $this-&gt;track-&gt;new_record(array('name' => 'The Amaranth', 'artist' => 'Nightwish'));<br />
+		$rec-&gt;save(); // adds a new row to the tracks table<br />
+		<br />
+		$rec2 = $this-&gt;track-&gt;find_by('name','Jane Doe');<br />
+		$rec2-&gt;name = 'Ice Queen';  // oops, I entered wrong name earlier :-)<br />
+		$rec2-&gt;save(); // modifies the existing row
+	</code>
+	
+	<h2>delete()</h2>
+	
+	<p>
+		Deletes the row which the <kbd>IR_record</kbd> is attached to.<br />
+		The <strong>internal</strong> id and relations are dropped in the local object, but all other data are preserved
+		(so you can continue to use the properties, or save it again).
+	</p>
+	
+	<code>
+		$rec = $this-&gt;track-&gt;find_by(array('name','artist'), array('The Amaranth','Nightwish'));<br />
+		$rec-&gt;delete(); // sorry, you were better with your earlier albums :(
+	</code>
+	
+	<h2>delete_all()</h2>
+	
+	<p>
+		This method deletes all data in the table the model is associated with
+		and destroys all relationship data.<br />
+		This method is a method of the <kbd>IgnitedRecord</kbd> class.
+	</p>
+	
+	<p class="important">
+		<strong>Attention:</strong>&nbsp; This method will destroy all data in the table!
+	</p>
+</div>
+
+
+<div id="footer">
+<p><a href="#top">Top of Page</a></p>
+<p><a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord</a>  &nbsp;&middot;&nbsp; Copyright &#169; 2008 &nbsp;&middot;&nbsp; Martin Wernstahl</p>
+<p><a href="http://codeigniter.com">CodeIgniter</a> &nbsp;&middot;&nbsp; Copyright &#169; 2006-2008 &nbsp;&middot;&nbsp; <a href="http://ellislab.com/">Ellislab, Inc.</a></p>
+</div>
+
+
+</body>
+</html>

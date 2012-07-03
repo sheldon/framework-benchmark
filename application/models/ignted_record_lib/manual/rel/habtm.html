@@ -1,0 +1,195 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv='expires' content='-1' />
+	<meta http-equiv= 'pragma' content='no-cache' />
+	
+	<title>The Has And Belongs To Many Relationship - IgnitedRecord User Guide Version 0.2.0</title>
+	
+	<link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+	<link rel="Shortcut Icon" href="../images/favicon.ico">
+	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+	
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../nav.js"></script>
+	<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+	$('#nav').hide();
+	$('#toggle_toc').click(function(){
+		$('#nav').slideToggle();
+	})
+});
+	</script>
+</head>
+<body>
+<div id="nav">
+	<script type="text/javascript">menu('../');</script>
+</div>
+<div id="nav2"><a name="top"></a><a id="toggle_toc"><img src="../images/nav_toggle.jpg" width="153" height="44" border="0" title="Toggle Table of Contents" alt="Toggle Table of Contents" /></a></div>
+<div id="masthead">
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td><h1>IgnitedRecord User Guide Version 0.2.0</h1></td>
+<td id="breadcrumb_right"><a href="../toc.html">Table of Contents Page</a></td>
+</tr>
+</table>
+</div>
+<!-- END NAVIGATION -->
+
+
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td id="breadcrumb">
+<a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord Home</a> &nbsp;&#8250;&nbsp; IgnitedRecord User Guide &nbsp;&#8250;&nbsp; The Has And Belongs To Many Relationship
+</td>
+<td id="searchbox"></td>
+</tr>
+</table>
+
+<div id="content">
+	<h1>The Has And Belongs To Many Relationship</h1>
+	
+	<p>
+		This is the relation you choose when you need to have many to many relations.
+		For example a developer can have (or belong to) many clients, but a client can have (or belong to) many developers.
+	</p>
+	
+	<p>
+		Example table diagram:
+	</p>
+	<table cellpadding="0" cellspacing="0">
+		<tr>
+			<td>
+				<code>
+		class person extends IgnitedRecord{<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;var $table = 'people'; // override the default value: persons<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;var $habtm = 'pictures';<br />
+		}
+				</code>
+				<code>
+		class picture extends IgnitedRecord{<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;var $habtm = array('table' => 'people', 'model' => 'person'); // set a model<br />
+		}
+				</code>
+			</td>
+			<td>
+				<img src="../images/habtm.png" />
+			</td>
+		</tr>
+	</table>
+	
+	<p>
+		Example of data inserted and with relations in both ways:
+	</p>
+	
+	<img src="../images/habtm_example.png" />
+	
+	<p>
+		Here the Another Person relates to both img1 and img3, while img2 relates to both Foo Bar and Some Dude.
+	</p>
+	
+	<p>
+		Example returns when calling <dfn>get_related()</dfn>:
+	</p>
+	
+	<code>
+		$rec = $this-&gt;person-&gt;find(2); // find Another Person<br />
+		<br />
+		echo "Pictures containing {$rec->firstname}";<br />
+		<br />
+		$pictures = $rec-&gt;get_related('pictures');<br />
+		<br />
+		foreach($pictures as $pic){<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;echo '&lt;img src="'.$pic->path.'" /&gt;'; // insert image<br />
+		<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;// echo those other people on the picture<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;foreach($pic->get_related('people') as $person){<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;echo " $person->firstname ";<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+		&nbsp;&nbsp;&nbsp;&nbsp;echo "\n";<br />
+		}<br />
+		<br />
+		// echoes:<br />
+		Pictures containing Foo<br />
+		&lt;img src="img2.jpg" /&gt; Foo &nbsp;Some 
+	</code>
+	
+	<p>
+		Settings, their default values and their keynames:
+	</p>
+	
+	<table cellpadding="0" cellspacing="1" border="0" class="tableborder">
+		<tr>
+			<th>Key</th>
+			<th>Short</th>
+			<th>Default</th>
+			<th>Description</th>
+		</tr>
+		<tr>
+			<td class="td">table</td>
+			<td class="td" style="text-align:center;">-</td>
+			<td class="td"><kbd>name</kbd></td>
+			<td class="td">The related table</td>
+		</tr>
+		<tr>
+			<td class="td">name</td>
+			<td class="td" style="text-align:center;">-</td>
+			<td class="td"><kbd>tablename</kbd></td>
+			<td class="td">The relation name, used when adding, removing and loading related records</td>
+		</tr>
+		<tr>
+			<td class="td">model</td>
+			<td class="td" style="text-align:center;">-</td>
+			<td class="td">
+				<kbd>tablename</kbd> or singular(<kbd>tablename</kbd>),
+				depending on if a model with that name exists
+			</td>
+			<td class="td">
+				The model to be used when instantiating related records<br />
+				(if no model is found, it creates records which doesn't link to the database)
+			</td>
+		</tr>
+		<tr>
+			<td class="td">join_table</td>
+			<td class="td" style="text-align:center;">-</td>
+			<td class="td">
+				<kbd>relatedtablename</kbd>_<kbd>tablename</kbd> ,
+				ordered alphabetically.
+			</td>
+			<td class="td">
+				The table used to link the two tables together.
+			</td>
+		</tr>
+		<tr>
+			<td class="td">foreign_key</td>
+			<td class="td" style="text-align:center;">fk</td>
+			<td class="td"><kbd>modelname</kbd> + _id</td>
+			<td class="td">The foreign key column used relating to <strong>this</strong> table</td>
+		</tr>
+		<tr>
+			<td class="td">related_foreign_key</td>
+			<td class="td">related_fk, or r_fk</td>
+			<td class="td"><kbd>modelname of the related table</kbd> + _id</td>
+			<td class="td">The foreign key column used relating to the related table</td>
+		</tr>
+	</table>
+	
+	<p>
+		The <kbd>name</kbd> or <kbd>table</kbd> setting must be specified when
+		specifying the settings as properties.<br />
+		When specifying relations using <dfn>habtm()</dfn> or <dfn>has_and_belongs_to_many()</dfn>,
+		the name must always be set.
+	</p>
+</div>
+
+
+<div id="footer">
+<p><a href="#top">Top of Page</a></p>
+<p><a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord</a>  &nbsp;&middot;&nbsp; Copyright &#169; 2008 &nbsp;&middot;&nbsp; Martin Wernstahl</p>
+<p><a href="http://codeigniter.com">CodeIgniter</a> &nbsp;&middot;&nbsp; Copyright &#169; 2006-2008 &nbsp;&middot;&nbsp; <a href="http://ellislab.com/">Ellislab, Inc.</a></p>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,133 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv='expires' content='-1' />
+	<meta http-equiv= 'pragma' content='no-cache' />
+	
+	<title>Establish Relationships - IgnitedRecord User Guide Version 0.2.0</title>
+	
+	<link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+	<link rel="Shortcut Icon" href="../images/favicon.ico">
+	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+	
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../nav.js"></script>
+	<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+	$('#nav').hide();
+	$('#toggle_toc').click(function(){
+		$('#nav').slideToggle();
+	})
+});
+	</script>
+</head>
+<body>
+<div id="nav">
+	<script type="text/javascript">menu('../');</script>
+</div>
+<div id="nav2"><a name="top"></a><a id="toggle_toc"><img src="../images/nav_toggle.jpg" width="153" height="44" border="0" title="Toggle Table of Contents" alt="Toggle Table of Contents" /></a></div>
+<div id="masthead">
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td><h1>IgnitedRecord User Guide Version 0.2.0</h1></td>
+<td id="breadcrumb_right"><a href="../toc.html">Table of Contents Page</a></td>
+</tr>
+</table>
+</div>
+<!-- END NAVIGATION -->
+
+
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td id="breadcrumb">
+<a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord Home</a> &nbsp;&#8250;&nbsp; IgnitedRecord User Guide &nbsp;&#8250;&nbsp; Establish Relationships
+</td>
+<td id="searchbox"></td>
+</tr>
+</table>
+
+<div id="content">
+	<h1>Establish Relationships</h1>
+	
+	<p>
+		So, now you have defined relationships between different tables.<br />
+		To establish relationships between records in those tables the
+		<kbd>IR_record</kbd> has two methods for performing this:
+		<ul>
+			<li><dfn>add_relationship()</dfn></li>
+			<li><dfn>add()</dfn></li>
+		</ul>
+	</p>
+	
+	<h2>add_relationship(<var>object</var>, <var>rel_name</var> = <kbd>false</kbd>)</h2>
+	
+	<p>
+		The <dfn>add_relationship()</dfn> method takes an object (<var>object</var>)
+		to link the record with, and an optional relation name (<var>rel_name</var>).
+	</p>
+	
+	<p>
+		If <var>rel_name</var> is not set, IgnitedRecord will try to figure it 
+		out (but it is a bit slower).<br />
+		If you have a few relations relating to the same table, then you must
+		specify the relation name, otherwise IgnitedRecord may pick wrong relation.
+	</p>
+	
+	<p>
+		Example:
+	</p>
+	
+	<code>
+		$rec = $this-&gt;user-&gt;new_record();<br />
+		$rec-&gt;name = &#x27;Foo&#x27;;<br />
+		<br />
+		$rec2 = $this-&gt;post-&gt;new_record();<br />
+		$rec2-&gt;text = &#x27;This is a great post!&#x27;;<br />
+		<br />
+		$rec-&gt;add_related($rec2); // this causes both $rec and $rec2 to be saved, but not any other related objects
+	</code>
+	
+	<p>
+		<strong>Note:</strong>&nbsp; All objects involved when creating a relation will be saved.
+	</p>
+	
+	<p>
+		If a relation exists between them already, IgnitedRecord won't do anything.<br />
+		If no relation is defined between the two tables IgnitedRecord will log an error.
+	</p>
+	
+	<p>
+		<dfn>add_related()</dfn> and <dfn>add()</dfn> will return <kbd>true</kbd>
+		if a relation is established, <kbd>false</kbd> otherwise.
+	</p>
+	
+	<h2>add(<var>rel_name</var>, <var>object</var>)</h2>
+	
+	<p>
+		This is an alias for <dfn>add_related</dfn> which just shortens the code
+		and makes the code more easy to read when you are using a relation name.
+	</p>
+	
+	<p>
+		Example:
+	</p>
+	
+	<code>
+		$rec-&gt;add('posts', $another_rec);<br />
+		$rec-&gt;add('address', $address_obj);<br />
+		<br />
+		$rec2-&gt;add('children', $obj);<br />
+	</code>
+</div>
+
+
+<div id="footer">
+<p><a href="#top">Top of Page</a></p>
+<p><a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord</a>  &nbsp;&middot;&nbsp; Copyright &#169; 2008 &nbsp;&middot;&nbsp; Martin Wernstahl</p>
+<p><a href="http://codeigniter.com">CodeIgniter</a> &nbsp;&middot;&nbsp; Copyright &#169; 2006-2008 &nbsp;&middot;&nbsp; <a href="http://ellislab.com/">Ellislab, Inc.</a></p>
+</div>
+
+
+</body>
+</html>

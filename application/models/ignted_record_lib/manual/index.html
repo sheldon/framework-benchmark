@@ -1,0 +1,103 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv='expires' content='-1' />
+	<meta http-equiv= 'pragma' content='no-cache' />
+	
+	<title>About IgnitedRecord - IgnitedRecord User Guide Version 0.2.0</title>
+	
+	<link rel='stylesheet' type='text/css' media='all' href='./userguide.css' />
+	<link rel="Shortcut Icon" href="images/favicon.ico">
+	<link rel="icon" href="images/favicon.ico" type="image/x-icon">
+	
+	<script type="text/javascript" src="./jquery.js"></script>
+	<script type="text/javascript" src="./nav.js"></script>
+	<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+	$('#nav').hide();
+	$('#toggle_toc').click(function(){
+		$('#nav').slideToggle();
+	})
+});
+	</script>
+</head>
+<body>
+<div id="nav">
+	<script type="text/javascript">menu();</script>
+</div>
+<div id="nav2"><a name="top"></a><a id="toggle_toc"><img src="images/nav_toggle.jpg" width="153" height="44" border="0" title="Toggle Table of Contents" alt="Toggle Table of Contents" /></a></div>
+<div id="masthead">
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td><h1>IgnitedRecord User Guide Version 0.2.0</h1></td>
+<td id="breadcrumb_right"><a href="toc.html">Table of Contents Page</a></td>
+</tr>
+</table>
+</div>
+<!-- END NAVIGATION -->
+
+
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td id="breadcrumb">
+<a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord Home</a> &nbsp;&#8250;&nbsp; IgnitedRecord User Guide &nbsp;&#8250;&nbsp; About IgnitedRecord
+</td>
+<td id="searchbox"></td>
+</tr>
+</table>
+
+<div id="content">
+	<div class="center"><img src="images/ignitedrecord_logo.png" border="0" alt="IgnitedRecord" /></div>
+
+	<h2>About IgnitedRecord</h2>
+	
+	<p>
+		IgnitedRecord is a relation handling <abbr title="Object Relational Mapping">ORM</abbr>
+		<sup><a name="id1" href="#ftn.id1">[1]</a></sup> library, reminding a bit of
+		<a href="http://www.rubyonrails.com">Ruby on Rails</a>' ActiveRecord<sup><a name="id2" href="#ftn.id2">[2]</a></sup> implementation,
+		made for the PHP framework <a href="http://www.codeigniter.com">CodeIgniter</a>.
+	</p>
+
+	<p>
+		The goal of IgnitedRecord is to provide an easy to use, easily customizeable, ORM library to CodeIgniter.
+	</p>
+	
+	<h2>Architecture of IgnitedRecord</h2>
+	
+	<p>
+		IgnitedRecord is designed with the factory pattern in mind
+		and the models themselves does not contain the data.<br />
+		Instead, they handle all the interaction with the database and provide the methods
+		for fetching record objects from the database.<br />
+		The record objects contain a reference to the object which created them,
+		thus getting the ability to interact with the database.
+	</p>
+	
+	<p>
+		So instead of creating new instances of the model, as you do in normal
+		ActiveRecord, you ask the model to instantiate the records.
+	</p>
+	
+	<div class="footnote">
+		<p>
+			<sup><a name="ftn.id1" href="#id1">[1]</a></sup>
+			Object Relational Mapping, See <a href="http://wikipedia.org/wiki/Object-relational_mapping">Wikipedia about Object Relational Mapping</a>
+		</p>
+		<p>
+			<sup><a name="ftn.id2" href="#id2">[2]</a></sup>
+			A pattern for Object Relational Mapping, See <a href="http://wikipedia.org/wiki/Active_Record">Wikipedia about ActiveRecord</a>
+		</p>
+	</div>
+</div>
+
+
+<div id="footer">
+<p><a href="#top">Top of Page</a></p>
+<p><a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord</a>  &nbsp;&middot;&nbsp; Copyright &#169; 2008 &nbsp;&middot;&nbsp; Martin Wernstahl</p>
+<p><a href="http://codeigniter.com">CodeIgniter</a> &nbsp;&middot;&nbsp; Copyright &#169; 2006-2008 &nbsp;&middot;&nbsp; <a href="http://ellislab.com/">Ellislab, Inc.</a></p>
+</div>
+
+
+</body>
+</html>

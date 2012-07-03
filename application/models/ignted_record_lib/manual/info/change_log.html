@@ -1,0 +1,253 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv='expires' content='-1' />
+	<meta http-equiv= 'pragma' content='no-cache' />
+	
+	<title>Change Log - IgnitedRecord User Guide Version 0.2.0</title>
+	
+	<link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+	<link rel="Shortcut Icon" href="../images/favicon.ico">
+	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+	
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../nav.js"></script>
+	<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+	$('#nav').hide();
+	$('#toggle_toc').click(function(){
+		$('#nav').slideToggle();
+	})
+});
+	</script>
+</head>
+<body>
+<div id="nav">
+	<script type="text/javascript">menu('../');</script>
+</div>
+<div id="nav2"><a name="top"></a><a id="toggle_toc"><img src="../images/nav_toggle.jpg" width="153" height="44" border="0" title="Toggle Table of Contents" alt="Toggle Table of Contents" /></a></div>
+<div id="masthead">
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td><h1>IgnitedRecord User Guide Version 0.2.0</h1></td>
+<td id="breadcrumb_right"><a href="toc.html">Table of Contents Page</a></td>
+</tr>
+</table>
+</div>
+<!-- END NAVIGATION -->
+
+
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td id="breadcrumb">
+<a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord Home</a> &nbsp;&#8250;&nbsp; IgnitedRecord User Guide &nbsp;&#8250;&nbsp; Change Log
+</td>
+<td id="searchbox"></td>
+</tr>
+</table>
+
+<div id="content">
+	<h1>Change Log</h1>
+	
+	<h2>Version 0.2.0</h2>
+	
+	<p>
+		Release Date: August 27, 2008<br />
+		SVN Revision: 101
+	</p>
+	
+	<ul>
+		<li>Rewrote most of the relation code to...
+			<ul>
+				<li>Make it more compact and more efficient</li>
+				<li>
+					Correct the bug when IgnitedRecord cannot find the model of
+					a related table (because it was not existing in the constructor)
+				</li>
+				<li>
+					Enable sorting and filtering (and extreme customization :-) )
+					when fetching related records
+				</li>
+				<li>Make it easier to mantain for me :P</li>
+				<li>
+					<strong>Note:</strong> The foreign column names now default to {singular}_id instead of {plural}_id
+				</li>
+				<li>
+					<strong>Note:</strong> The <var>column</var> term have been replaced with <var>foreign_key</var>,
+					shorted to <var>fk</var>
+				</li>
+				<li>
+					<strong>Note:</strong> The <var>foreign_column</var> term have been replaced with <var>related_foreign_key</var>,
+					shorted to <var>related_fk</var>
+				</li>
+				<li>
+					<strong>Note:</strong> The <var>rel_table</var> term have been replaced with <var>join_table</var>
+				</li>
+			</ul>
+		</li>
+		<li><strong>Note:</strong> All properties of the <kbd>IgnitedRecord</kbd> class are no longer prefixed by double underscores!</li>
+		<li>Added <dfn>has_many()</dfn>, <dfn>has_one()</dfn>, <dfn>belongs_to()</dfn>
+			and <dfn>habtm()</dfn> which specifies the settings for relations
+			through <kbd>IR_RelProperty</kbd> objects</li>
+		<li>Removed <dfn>set_belongs_to()</dfn>, <dfn>set_has_many()</dfn>, <dfn>set_has_one()</dfn> and 
+			<dfn>set_habtm()</dfn> in favor of those above</li>
+		<li>Added the abillity to join related records into the currently forming query (only Has One and Belongs To, requires IgnitedQuery)</li>
+		<li>The property <kbd>$__auto_load_relationships</kbd> has been removed</li>
+		<li>Added <dfn>act_as()</dfn>, which can load behaviours on the fly</li>
+		<li>
+			Added <dfn>child_class()</dfn>, which can set the class name,
+			of the objects to create, on the fly
+		</li>
+		<li>
+			Added support for completely working serialization of
+			<kbd>IR_record</kbd>s (added <dfn>__sleep()</dfn> and
+			<dfn>__wakeup()</dfn>)
+		</li>
+		<li><dfn>establish_relationship()</dfn> (and <dfn>add()</dfn> + <dfn>add_relationship()</dfn>) now returns true/false depending on if it really was saved</li>
+		<li>Added hooks in <dfn>_dbobj2ORM()</dfn> which enables the hooked code to add / modify the <kbd>IR_record</kbd> object before / after their creation</li>
+		<li>Removed <dfn>get_related()</dfn> from <kbd>IR_Record</kbd></li>
+		<li>The <b>u</b>nique <b>id</b>entifier can now be handled as a property, but it won't be saved on UPDATEs</li>
+		<li>IgnitedRecord has now got it's own SQL string builder for the get-type queries (IgnitedQuery), optional</li>
+		<li>IgnitedRecord does no longer load the needed models, all models need to be loaded by the user</li>
+		<li>SQL string generation methods can now be accessed directly from IgnitedRecord</li>
+		<li>Behaviours can now abort <dfn>save()</dfn>, <dfn>update()</dfn> and <dfn>delete()</dfn></li>
+		<li>IgnitedRecord does no longer extend the model class</li>
+		<li><kbd>IgnitedRecord_record</kbd> has been renamed to <kbd>IR_record</kbd></li>
+		<li>Moved the "helper" classes out of <kbd>ignitedrecord.php</kbd> into their own files</li>
+		<li>Rewrote the manual</li>
+		<li>Removed the Change Log from ignitedrecord.php, just waste of space having it in two places</li>
+	</ul>
+	
+	<h2>Version 0.1.1</h2>
+
+	<p>
+		Release Date: June 26, 2008<br />
+		SVN Revision: 1 (in tags)
+	</p>
+
+	<ul>
+	    <li>Added the method <dfn>uid()</dfn> to IgnitedRecord_record</li>
+	    <li>Added <dfn>yamlfactory()</dfn></li>
+	    <li>Added calls to <dfn>DB_result::free_result()</dfn> in all get methods,
+	        makes IgnitedRecord hog less memory and it becomes a bit faster</li>
+	    <li>Made the includes of the behaviour files relative to the <kbd>ignitedrecord.php</kbd> path</li>
+	    <li>Remade the <dfn>factory()</dfn> method, it now takes the tablename as the first parameter,
+	        and it is more effective, no more eval()</li>
+	    <li><dfn>_get_modelname()</dfn> now searches for models with tablename or singular of tablename
+	        both among the defined classes <strong>and</strong> in the CI object (propertyname = modelname)</li>
+	    <li>Tree behaviour: 
+	        <ul>
+	            <li>Added <dfn>is_child_of()</dfn> and <dfn>is_descendant_of()</dfn></li>
+	            <li>Made the root cache per model instead of per object</li>
+	            <li>id column is now fetched from the IgnitedRecord object</li>
+	            <li>The behaviour now checks if MPTtree already is loaded before loading</li>
+	            <li>Fixed <dfn>is_orphan()</dfn></li>
+	        </ul>
+	    </il>
+	    <li>Fixed a typo in <dfn>find_all_by()</dfn>, forgot db and a 1 too much</li>
+	</ul>
+
+	<h2>Version 0.1.0</h2>
+
+	<p>
+		Release Date: May 30, 2008<br />
+		SVN Revision: 1 (in tags)
+	</p>
+
+	<ul>
+		<li>Limited support for multiple primary keys has been implemented.</li>
+		<li><dfn>save()</dfn> now returns <kbd>true</kbd> if the INSERT/UPDATE query succeeded.</li>
+		<li>Added <dfn>set_belongs_to()</dfn>, <dfn>set_has_many()</dfn>, <dfn>set_has_one()</dfn> and <dfn>set_habtm()</dfn> (Has And Belongs To Many).</li>
+		<li><dfn>factory()</dfn> does not need the double underscores in the property names, double underscores are automatically added</li>
+		<li><dfn>save()</dfn> now only saves the record if it has been edited.</li>
+		<li>Because of the new <dfn>save()</dfn>, a <kbd>$force</kbd> option has been added.</li>
+		<li>The IgnitedRecord_tree have got <dfn>get_descendants()</dfn>.</li>
+		<li>A custom loader has been implemented.</li>
+		<li>Bugfixes:
+		<ul>
+			<li>id column does not exist when creating a new record</li>
+			<li>Misspellings and typos in the manual</li>
+		</ul>
+		</li>
+	</ul>
+
+	<h2>Version 0.1.0 RC 4</h2>
+
+	<p>
+		Release Date: May 3, 2008<br />
+		SVN Revision: 1 (in tags)
+	</p>
+
+	<ul>
+		<li>Remade the structure for storing the relations, now supports multiple relations to the same table with the same type of relations (provided their relation names are different), check <a href="#relations">Establish Relationships</a></li>
+		<li>Added error messages if a method was not found in the <dfn>__call()</dfn> methods</li>
+		<li>Loading of relations logs a warning message if a relation between the tables does not exist</li>
+		<li>Improved the <dfn>_strip_data()</dfn> method a bit</li>
+		<li>Added a custom <kbd>MY_Loader.php</kbd></li>
+		<li>The <dfn>factory()</dfn> method now prepends a double underscore on all propertynames in the second parameter</li>
+		<li>Bugfixes:
+		<ul>
+			<li><dfn>hooks()</dfn> argument missing</li>
+			<li>instance property not found</li>
+			<li>__relation_properties is not an array</li>
+		</ul>
+		</li>
+	</ul>
+	
+	<h2>Version 0.1.0 RC 3</h2>
+	
+	<p>
+		Release Date: May 1, 2008<br />
+		SVN Revision: 1 (in tags)
+	</p>
+	
+	<ul>
+		<li>Modified the hooks system, so references do work (if the recieving method takes the arguments by reference)</li>
+		<li>Corrected the notice "Only variable references should be returned by reference"</li>
+		<li>Made a check with references under PHP 4 (got db working, so now I can really test with PHP 4), so I believe they work as they should</li>
+	</ul>
+
+	<h2>Version 0.1.0 RC 2</h2>
+
+	<p>
+		Release Date: April 30, 2008<br />
+		SVN Revision: 1 (in tags)
+	</p>
+
+	<ul>
+		<li>Finally a name for this model, IgnitedRecord!</li>
+		<li>The data is now sanitized before insert/update, it removes all properties that doesn't match the field names</li>
+		<li>Added the <dfn>get()</dfn> method</li>
+		<li>Added the <dfn>factory()</dfn> method, creates a new model instance from supplied settings</li>
+		<li>Added the <dfn>in_db()</dfn> method (IgnitedRecord_record)</li>
+		<li>Added Act_As, to enable easier customization of the IgnitedRecord class.</li>
+		<li>Added a Child_class_helper array which contains all helper class names to be assigned to the child 	classes.</li>
+		<li>Implemented a basic hook system.</li>
+		<li>Added a lot of hooks into the main IgnitedRecord class.</li>
+		<li>Added the ability to name relations, this enables the use of relations referring to self and has_many, belongs_to, has_one and has_and_belongs_to_many can relate to the same table without them overwriting eachother (useful for the Adjacency tree).</li>
+		<li>Created a MPTtree behaviour, IgnitedRecord_tree (requires <a href="http://www.cibase.info/index.php/code/details/11">MPTtree</a>)</li>
+	</ul>
+	
+	<h2>Version 0.1.0 RC 1</h2>
+	
+	<p>
+		Release Date: April 5, 2008<br />
+		SVN Revision: none
+	</p>
+	
+	<ul>
+		<li>Initial Release</li>
+	</ul>
+</div>
+
+
+<div id="footer">
+<p><a href="#top">Top of Page</a></p>
+<p><a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord</a>  &nbsp;&middot;&nbsp; Copyright &#169; 2008 &nbsp;&middot;&nbsp; Martin Wernstahl</p>
+<p><a href="http://codeigniter.com">CodeIgniter</a> &nbsp;&middot;&nbsp; Copyright &#169; 2006-2008 &nbsp;&middot;&nbsp; <a href="http://ellislab.com/">Ellislab, Inc.</a></p>
+</div>
+
+
+</body>
+</html>

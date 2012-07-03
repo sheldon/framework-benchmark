@@ -1,0 +1,171 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv='expires' content='-1' />
+	<meta http-equiv= 'pragma' content='no-cache' />
+	
+	<title>Fetching Data - IgnitedRecord User Guide Version 0.2.0</title>
+	
+	<link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+	<link rel="Shortcut Icon" href="../images/favicon.ico">
+	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+	
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../nav.js"></script>
+	<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+	$('#nav').hide();
+	$('#toggle_toc').click(function(){
+		$('#nav').slideToggle();
+	})
+});
+	</script>
+</head>
+<body>
+<div id="nav">
+	<script type="text/javascript">menu('../');</script>
+</div>
+<div id="nav2"><a name="top"></a><a id="toggle_toc"><img src="../images/nav_toggle.jpg" width="153" height="44" border="0" title="Toggle Table of Contents" alt="Toggle Table of Contents" /></a></div>
+<div id="masthead">
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td><h1>IgnitedRecord User Guide Version 0.2.0</h1></td>
+<td id="breadcrumb_right"><a href="../toc.html">Table of Contents Page</a></td>
+</tr>
+</table>
+</div>
+<!-- END NAVIGATION -->
+
+
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td id="breadcrumb">
+<a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord Home</a> &nbsp;&#8250;&nbsp; IgnitedRecord User Guide &nbsp;&#8250;&nbsp; Fetching Data
+</td>
+<td id="searchbox"></td>
+</tr>
+</table>
+
+<div id="content">
+	<h1>Fetching Data</h1>
+	
+	<p>
+		All data is stored in <kbd>IR_record</kbd>s.
+		To fetch an <kbd>IR_record</kbd> object from IgnitedRecord, use one of the following methods:
+	</p>
+	
+	<h2>find([<var>id</var>])</h2>
+
+	<p>
+		The <dfn>find()</dfn> method returns the record with the supplied id <var>id</var>.<br />
+		Returns <kbd>false</kbd> if nothing was found.
+	</p>
+	
+	<p>
+		If <var>id</var> is not specified this method works like <dfn>get()</dfn>.
+	</p>
+	
+	<h2>get()</h2>
+	
+	<p>
+		This method fetches one record from the table.
+		It is meant to be used in conjunction with the <a href="adv_fetch.html">Advanced Filtering</a>,
+		where the CodeIgniter ActiveRecord class filters and sorts the query
+		(you can see it as a replacement for the Active Record's <dfn>get()</dfn> method).
+	</p>
+	
+	<p>
+		The only call to the db this method does is the following (to fetch the row from the mapped table):<br />
+		<tt>$data = $this-&gt;db-&gt;get($this-&gt;table, 1);</tt>, see
+		<a href="adv_fetch.html">Advanced Filtering</a> for details.
+	</p>
+	
+	<p>
+		Returns <kbd>false</kbd> if nothing was found.
+	</p>
+	
+	<code>
+	$this-&gt;db-&gt;where_in('title', array('about', 'latest', 'notes'));<br />
+	$record = $this-&gt;page-&gt;get();
+	</code>
+	
+	<h2>find_by(<var>column(s)</var>, <var>data</var>)</h2>
+	
+	<p>
+		Returns the first record where the data in the column(s) <var>column(s)</var> matches <var>data</var>.<br />
+		The <var>column(s)</var> parameter can be array or scalar, the same for <var>data</var>.
+		These two arrays are then merged into an array, where the elements in the
+		<var>column(s)</var> array is the keys and the elements in the
+		<var>data</var> array are values. This array are then sent to
+		CodeIgniter's ActiveRecord library, so the <var>column(s)</var>
+		can contain !=, &gt;, &lt;, etc.
+	</p>
+	
+	<p>
+		Example:
+	</p>
+	
+	<code>
+		$record = $this->page->find_by('title','index'); // searches for a record with the title 'index'<br />
+		$record = $this->page->find_by(array('id >','title'),array(3,'blog'));
+		// searches for a record where the id is greater than 3 and the title equals 'blog'
+	</code>
+	
+	<h2>find_by_sql('<var>sql_query_string</var>')</h2>
+	
+	<p>
+		Returns a record (the first one, so limit the query to return one row to lower bandwith usage)
+		created from the data returned from the query <var>sql_query_string</var>.
+		The query should be escaped and should start with 'SELECT * ' or equivalent.
+	</p>
+	
+	<p>
+		Example:
+	</p>
+	
+	<code>
+		$record = $this->page->find_by_sql('SELECT *, count(*) AS Authors FROM pages WHERE Authors &gt; 2 LIMIT 1'); <br />
+		// this will also create a column named Authors, which will be ignored when you save the $record
+	</code>
+	
+	<h2>find_all()</h2>
+	
+	<p>
+		Returns all records in the table.
+	</p>
+	
+	<p>
+		Or, it could be used as a substitute for CodeIgniter's ActiveRecord <dfn>db::get()</dfn> method.
+		The only call to the db this method does is the following (to fetch all rows from the mapped table):<br />
+		<tt>$data = $this-&gt;db-&gt;get($this-&gt;table);</tt>, see
+		<a href="adv_fetch,html">Advanced Filtering</a> for details.
+	</p>
+	
+	<p>
+		The difference is that <dfn>find_all()</dfn> returns all rows, <dfn>get()</dfn> returns only one.
+	</p>
+	
+	<h2>find_all_by(<var>column(s)</var>, <var>data</var>)</h2>
+	
+	<p>
+		As <dfn>find_by()</dfn>, but returns all matching records.
+	</p>
+	
+	<h2>find_all_by_sql('<var>sql_query_string</var>')</h2>
+	
+	<p>
+		As <dfn>find_by_sql()</dfn>, but returns all matching records.
+	</p>
+</div>
+
+
+<div id="footer">
+<p><a href="#top">Top of Page</a></p>
+<p><a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord</a>  &nbsp;&middot;&nbsp; Copyright &#169; 2008 &nbsp;&middot;&nbsp; Martin Wernstahl</p>
+<p><a href="http://codeigniter.com">CodeIgniter</a> &nbsp;&middot;&nbsp; Copyright &#169; 2006-2008 &nbsp;&middot;&nbsp; <a href="http://ellislab.com/">Ellislab, Inc.</a></p>
+</div>
+
+
+</body>
+</html>

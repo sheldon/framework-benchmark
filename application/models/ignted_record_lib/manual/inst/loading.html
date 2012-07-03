@@ -1,0 +1,139 @@
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv='expires' content='-1' />
+	<meta http-equiv= 'pragma' content='no-cache' />
+	
+	<title>Loading IgnitedRecord - IgnitedRecord User Guide Version 0.2.0</title>
+	
+	<link rel='stylesheet' type='text/css' media='all' href='../userguide.css' />
+	<link rel="Shortcut Icon" href="../images/favicon.ico">
+	<link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+	
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript" src="../nav.js"></script>
+	<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+	$('#nav').hide();
+	$('#toggle_toc').click(function(){
+		$('#nav').slideToggle();
+	})
+});
+	</script>
+</head>
+<body>
+<div id="nav">
+	<script type="text/javascript">menu('../');</script>
+</div>
+<div id="nav2"><a name="top"></a><a id="toggle_toc"><img src="../images/nav_toggle.jpg" width="153" height="44" border="0" title="Toggle Table of Contents" alt="Toggle Table of Contents" /></a></div>
+<div id="masthead">
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td><h1>IgnitedRecord User Guide Version 0.2.0</h1></td>
+<td id="breadcrumb_right"><a href="../toc.html">Table of Contents Page</a></td>
+</tr>
+</table>
+</div>
+<!-- END NAVIGATION -->
+
+
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+<tr>
+<td id="breadcrumb">
+<a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord Home</a> &nbsp;&#8250;&nbsp; IgnitedRecord User Guide &nbsp;&#8250;&nbsp; Loading IgnitedRecord
+</td>
+<td id="searchbox"></td>
+</tr>
+</table>
+
+<div id="content">
+	<h1>Loading IgnitedRecord</h1>
+	
+	<p>
+		To use IgnitedRecord, you have to load it first.<br />
+		You can choose four different approaches to loading IgnitedRecord:
+	</p>
+	
+	<h2>Load as a Model</h2>
+	
+	<p>
+		Before you load any of the derived models/classes,
+		use <dfn>Loader::model()</dfn> to load IgnitedRecord.
+	</p>
+	
+	<code>
+		$this->load->model('ignitedrecord/ignitedrecord');<br />
+		$this->load->model('some_other_model');
+	</code>
+	
+	<h2>Load with the Custom Loader</h2>
+	
+	<code>
+		$this->load->orm();
+	</code>
+	
+	<p>
+		This also works as a wrapper for <dfn>Loader::model()</dfn>,
+		which enables you to do this:
+	</p>
+	
+	<code>
+		$this->load->orm('some_other_model');
+	</code>
+	
+	<p>
+		Then you have loaded both IgnitedRecord and some_other_model at the same time!
+	</p>
+	
+	<h2>Autoload</h2>
+	
+	<p>
+		Just add 'ignitedrecord/ignitedrecord' in the <dfn>congfig/autoload.php</dfn>'s model array:
+	</p>
+	
+	<code>
+		/*<br />
+		| -------------------------------------------------------------------<br />
+		| &nbsp;Auto-load Models<br />
+		| -------------------------------------------------------------------<br />
+		| Prototype:<br />
+		|<br />
+		|&nbsp;&nbsp;&nbsp;&nbsp;$autoload['model'] = array('model1', 'model2');<br />
+		|<br />
+		*/<br />
+		<br />
+		$autoload['model'] = array('ignitedrecord/ignitedrecord');
+	</code>
+	
+	<p>
+		And don't forget to autoload the database library.
+	</p>
+	
+	<h2>PHP include()</h2>
+	
+	<p>
+		This is the least recommended of these solutions,
+		just use the PHP function <dfn>include()</dfn>:
+	</p>
+	
+	<code>
+		include APPPATH.'models/ignitedrecord/ignitedrecord.php';
+	</code>
+	
+	<p>
+		I recommend using the <kbd>APPPATH</kbd> constant,
+		then everything is relative to the app root.
+	</p>
+</div>
+
+
+<div id="footer">
+<p><a href="#top">Top of Page</a></p>
+<p><a href="http://www.assembla.com/spaces/IgnitedRecord">IgnitedRecord</a>  &nbsp;&middot;&nbsp; Copyright &#169; 2008 &nbsp;&middot;&nbsp; Martin Wernstahl</p>
+<p><a href="http://codeigniter.com">CodeIgniter</a> &nbsp;&middot;&nbsp; Copyright &#169; 2006-2008 &nbsp;&middot;&nbsp; <a href="http://ellislab.com/">Ellislab, Inc.</a></p>
+</div>
+
+
+</body>
+</html>
